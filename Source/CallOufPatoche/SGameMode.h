@@ -6,8 +6,8 @@
 #include "GameFramework/GameModeBase.h"
 #include "SGameMode.generated.h"
 
-UCLASS(minimalapi)
-class ASGameMode : public AGameModeBase
+UCLASS()
+class CALLOUFPATOCHE_API ASGameMode : public AGameModeBase
 {
 	GENERATED_BODY()
 

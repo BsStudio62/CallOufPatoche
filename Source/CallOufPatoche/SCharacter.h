@@ -13,11 +13,13 @@ class UCameraComponent;
 class UInputAction;
 class UInputMappingContext;
 struct FInputActionValue;
+class ASWeapon;
 
+// Add log custom
 DECLARE_LOG_CATEGORY_EXTERN(LogTemplateCharacter, Log, All);
 
 UCLASS(config=Game)
-class ASCharacter : public ACharacter
+class CALLOUFPATOCHE_API ASCharacter : public ACharacter
 {
 	GENERATED_BODY()
 
@@ -46,6 +48,23 @@ public:
 	ASCharacter();
 
 protected:
+
+#pragma region Weapon 
+
+	// Weapon Starter //
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<ASWeapon> WeaponStarterClass;
+
+	// Weapon //
+	UPROPERTY(Replicated, BlueprintReadOnly)
+	ASWeapon* CurrentWeapon;
+
+	// Fake Weapon //
+	UPROPERTY(Replicated, BlueprintReadOnly)
+	ASWeapon* FakeWeapon;
+
+#pragma endregion
+
 	virtual void BeginPlay();
 
 public:
@@ -53,18 +72,6 @@ public:
 	/** Look Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	class UInputAction* LookAction;
-
-	/** Bool for AnimBP to switch to another animation set */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Weapon)
-	bool bHasRifle;
-
-	/** Setter to set the bool */
-	UFUNCTION(BlueprintCallable, Category = Weapon)
-	void SetHasRifle(bool bNewHasRifle);
-
-	/** Getter for the bool */
-	UFUNCTION(BlueprintCallable, Category = Weapon)
-	bool GetHasRifle();
 
 protected:
 	/** Called for movement input */

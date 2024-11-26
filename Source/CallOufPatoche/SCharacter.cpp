@@ -9,6 +9,9 @@
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
 #include "Engine/LocalPlayer.h"
+#include "SWeapon.h"
+//Access Macro Multiplayer
+#include "Net/UnrealNetwork.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
@@ -17,8 +20,6 @@ DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
 ASCharacter::ASCharacter()
 {
-	// Character doesnt have a rifle at start
-	bHasRifle = false;
 	
 	// Set size for collision capsule
 	GetCapsuleComponent()->InitCapsuleSize(55.f, 96.0f);
@@ -35,8 +36,8 @@ ASCharacter::ASCharacter()
 	Mesh1P->SetupAttachment(FirstPersonCameraComponent);
 	Mesh1P->bCastDynamicShadow = false;
 	Mesh1P->CastShadow = false;
-	//Mesh1P->SetRelativeRotation(FRotator(0.9f, -19.19f, 5.2f));
-	Mesh1P->SetRelativeLocation(FVector(-30.f, 0.f, -150.f));
+	Mesh1P->SetRelativeRotation(FRotator(0.0f, -90.0f, 0.0f));
+	Mesh1P->SetRelativeLocation(FVector(-10.f, 0.f, -158.f));
 
 }
 
@@ -52,6 +53,31 @@ void ASCharacter::BeginPlay()
 		{
 			Subsystem->AddMappingContext(DefaultMappingContext, 0);
 		}
+	}
+
+	
+	// Create Weapon server
+	if (HasAuthority())
+	{
+		if (!WeaponStarterClass) return;
+
+		FActorSpawnParameters Params;
+		Params.Owner = this;
+
+		// SpawnWeapon
+		CurrentWeapon = GetWorld()->SpawnActor<ASWeapon>(WeaponStarterClass, FVector::ZeroVector, FRotator::ZeroRotator, Params);
+		CurrentWeapon->SetOwner(this);
+		// Attach Weapon
+		CurrentWeapon->AttachToComponent(Mesh1P, FAttachmentTransformRules::SnapToTargetNotIncludingScale, CurrentWeapon->GetSocket());
+
+		// Spawn Fake Weapon
+		FakeWeapon = GetWorld()->SpawnActor<ASWeapon>(WeaponStarterClass, FVector::ZeroVector, FRotator::ZeroRotator, Params);
+		FakeWeapon->SetOwner(this);
+		// Attach Fake Weapon
+		FakeWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, FakeWeapon->GetSocket());	
+		FakeWeapon->HideFakeWeapon(true);
+		//FakeWeapon->SetHideWeapon(true);
+
 	}
 
 }
@@ -79,7 +105,6 @@ void ASCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 	}
 }
 
-
 void ASCharacter::Move(const FInputActionValue& Value)
 {
 	// input is a Vector2D
@@ -106,12 +131,10 @@ void ASCharacter::Look(const FInputActionValue& Value)
 	}
 }
 
-void ASCharacter::SetHasRifle(bool bNewHasRifle)
+void ASCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
-	bHasRifle = bNewHasRifle;
-}
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-bool ASCharacter::GetHasRifle()
-{
-	return bHasRifle;
+	DOREPLIFETIME(ASCharacter, CurrentWeapon);
+	DOREPLIFETIME(ASCharacter, FakeWeapon);
 }

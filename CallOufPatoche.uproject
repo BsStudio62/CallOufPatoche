@@ -3,6 +3,16 @@
 	"EngineAssociation": "{D20CCA13-4E39-6E72-9335-CEBF37932FEB}",
 	"Category": "",
 	"Description": "",
+	"Modules": [
+		{
+			"Name": "CallOufPatoche",
+			"Type": "Runtime",
+			"LoadingPhase": "Default",
+			"AdditionalDependencies": [
+				"Engine"
+			]
+		}
+	],
 	"Plugins": [
 		{
 			"Name": "ModelingToolsEditorMode",

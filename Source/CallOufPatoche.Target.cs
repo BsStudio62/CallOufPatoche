@@ -8,8 +8,13 @@ public class CallOufPatocheTarget : TargetRules
 	public CallOufPatocheTarget(TargetInfo Target) : base(Target)
 	{
 		Type = TargetType.Game;
-		DefaultBuildSettings = BuildSettingsVersion.V4;
 
-		ExtraModuleNames.AddRange( new string[] { "CallOufPatoche" } );
+        // Update build settings
+        DefaultBuildSettings = BuildSettingsVersion.Latest;
+
+        // Update include order version
+        IncludeOrderVersion = EngineIncludeOrderVersion.Latest;
+
+        ExtraModuleNames.AddRange( new string[] { "CallOufPatoche" } );
 	}
 }
