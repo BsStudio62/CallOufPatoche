@@ -10,6 +10,7 @@
 #include "InputActionValue.h"
 #include "Engine/LocalPlayer.h"
 #include "SWeapon.h"
+#include "Input/SInputConfigCharacter.h"
 //Access Macro Multiplayer
 #include "Net/UnrealNetwork.h"
 
@@ -41,21 +42,9 @@ ASCharacter::ASCharacter()
 
 }
 
-void ASCharacter::BeginPlay()
+void ASCharacter::CreateWeapon()
 {
-	// Call the base class  
-	Super::BeginPlay();
 
-	// Add Input Mapping Context
-	if (APlayerController* PlayerController = Cast<APlayerController>(Controller))
-	{
-		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
-		{
-			Subsystem->AddMappingContext(DefaultMappingContext, 0);
-		}
-	}
-
-	
 	// Create Weapon server
 	if (HasAuthority())
 	{
@@ -70,16 +59,37 @@ void ASCharacter::BeginPlay()
 		// Attach Weapon
 		CurrentWeapon->AttachToComponent(Mesh1P, FAttachmentTransformRules::SnapToTargetNotIncludingScale, CurrentWeapon->GetSocket());
 
+
 		// Spawn Fake Weapon
 		FakeWeapon = GetWorld()->SpawnActor<ASWeapon>(WeaponStarterClass, FVector::ZeroVector, FRotator::ZeroRotator, Params);
 		FakeWeapon->SetOwner(this);
 		// Attach Fake Weapon
-		FakeWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, FakeWeapon->GetSocket());	
+		FakeWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, FakeWeapon->GetSocket());
 		FakeWeapon->HideFakeWeapon(true);
-		//FakeWeapon->SetHideWeapon(true);
 
 	}
 
+
+	if (CurrentWeapon) CurrentWeapon->StartPlay();
+
+}
+
+void ASCharacter::BeginPlay()
+{
+	// Call the base class  
+	Super::BeginPlay();
+
+	// Add Input Mapping Context
+	if (APlayerController* PlayerController = Cast<APlayerController>(Controller))
+	{
+		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
+		{
+			Subsystem->AddMappingContext(CharacterMappingContext, 0);
+		}
+	}
+
+	CreateWeapon();
+	
 }
 
 //////////////////////////////////////////////////////////////////////////// Input
@@ -90,14 +100,15 @@ void ASCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 	if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent))
 	{
 		// Jumping
-		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &ACharacter::Jump);
-		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
+		EnhancedInputComponent->BindAction(InputActions->JumpAction, ETriggerEvent::Started, this, &ACharacter::Jump);
+		EnhancedInputComponent->BindAction(InputActions->JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
 
 		// Moving
-		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ASCharacter::Move);
+		EnhancedInputComponent->BindAction(InputActions->MoveAction, ETriggerEvent::Triggered, this, &ASCharacter::Move);
 
 		// Looking
-		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ASCharacter::Look);
+		EnhancedInputComponent->BindAction(InputActions->LookAction, ETriggerEvent::Triggered, this, &ASCharacter::Look);
+		
 	}
 	else
 	{

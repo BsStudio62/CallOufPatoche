@@ -10,8 +10,8 @@
 class UInputComponent;
 class USkeletalMeshComponent;
 class UCameraComponent;
-class UInputAction;
 class UInputMappingContext;
+class USInputConfigCharacter;
 struct FInputActionValue;
 class ASWeapon;
 
@@ -33,21 +33,16 @@ class CALLOUFPATOCHE_API ASCharacter : public ACharacter
 
 	/** MappingContext */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
-	UInputMappingContext* DefaultMappingContext;
-
-	/** Jump Input Action */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
-	UInputAction* JumpAction;
-
-	/** Move Input Action */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
-	UInputAction* MoveAction;
+	UInputMappingContext* CharacterMappingContext;
 	
 public:
 
 	ASCharacter();
 
 protected:
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Enhanced Input")
+	USInputConfigCharacter* InputActions;
 
 #pragma region Weapon 
 
@@ -63,15 +58,11 @@ protected:
 	UPROPERTY(Replicated, BlueprintReadOnly)
 	ASWeapon* FakeWeapon;
 
+	void CreateWeapon();
+
 #pragma endregion
 
 	virtual void BeginPlay();
-
-public:
-		
-	/** Look Input Action */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-	class UInputAction* LookAction;
 
 protected:
 	/** Called for movement input */
