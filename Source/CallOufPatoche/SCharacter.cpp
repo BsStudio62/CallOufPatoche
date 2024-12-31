@@ -55,22 +55,19 @@ void ASCharacter::CreateWeapon()
 
 		// SpawnWeapon
 		CurrentWeapon = GetWorld()->SpawnActor<ASWeapon>(WeaponStarterClass, FVector::ZeroVector, FRotator::ZeroRotator, Params);
-		CurrentWeapon->SetOwner(this);
 		// Attach Weapon
 		CurrentWeapon->AttachToComponent(Mesh1P, FAttachmentTransformRules::SnapToTargetNotIncludingScale, CurrentWeapon->GetSocket());
 
-
 		// Spawn Fake Weapon
 		FakeWeapon = GetWorld()->SpawnActor<ASWeapon>(WeaponStarterClass, FVector::ZeroVector, FRotator::ZeroRotator, Params);
-		FakeWeapon->SetOwner(this);
 		// Attach Fake Weapon
 		FakeWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, FakeWeapon->GetSocket());
 		FakeWeapon->HideFakeWeapon(true);
 
 	}
 
-
-	if (CurrentWeapon) CurrentWeapon->StartPlay();
+	FTimerHandle TimerHandleDelay;
+	GetWorldTimerManager().SetTimer(TimerHandleDelay, this, &ASCharacter::StartDelayed, 0.5f);
 
 }
 
@@ -140,6 +137,31 @@ void ASCharacter::Look(const FInputActionValue& Value)
 		AddControllerYawInput(LookAxisVector.X);
 		AddControllerPitchInput(LookAxisVector.Y);
 	}
+}
+
+void ASCharacter::StartDelayed()
+{
+	SetupAnimationLayer();
+
+	CurrentWeapon->SetupInputSystem();
+
+	CurrentWeapon->SetFakeWeapon(FakeWeapon);
+
+}
+
+void ASCharacter::SetupAnimationLayer()
+{
+
+	if (!CurrentWeapon) return;
+
+	UE_LOG(LogTemplateCharacter, Error, TEXT("'%s' CurrentWeapon valid"), *GetNameSafe(this));
+
+	//Setup Layer 1P
+	Mesh1P->LinkAnimClassLayers(CurrentWeapon->GetAnimationLayerFP());
+
+	//Setup Layer TP
+	GetMesh()->LinkAnimClassLayers(CurrentWeapon->GetAnimationLayerTP());
+
 }
 
 void ASCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const

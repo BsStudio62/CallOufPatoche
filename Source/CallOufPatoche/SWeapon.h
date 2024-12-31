@@ -34,6 +34,8 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+#pragma region Input
+
 	/** MappingContext */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputMappingContext* WeaponMappingContext;
@@ -41,9 +43,13 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Enhanced Input")
 	USInputConfigWeapon* InputActions;
 
-	/** Pawn mesh: 1st person view (arms; seen only by self) */
+#pragma endregion 
+
+	/** Weapon Mesh */
 	UPROPERTY(VisibleDefaultsOnly, Category = Mesh)
 	USkeletalMeshComponent* Weapon;
+
+	ASWeapon* FakeWeaponTP;
 
 	UPROPERTY(EditDefaultsOnly)
 	FName Socket;
@@ -96,22 +102,34 @@ protected:
 	UPROPERTY(EditDefaultsOnly)
 	int32 MagazineCapacity;
 
-	// Verification Munition not 0
-	bool CheckMunition();
+	void PlayAnimation();
 
-	void SetupInputSystem();
+	// Verification Munition not egal 0 //
+	bool CheckMunition();
 
 	UFUNCTION()
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
-	
+#pragma region // Animation
+
+	UPROPERTY(EditDefaultsOnly, category = "Animation")
+	TSubclassOf<UAnimInstance> AnimationLayerFP;
+
+	UPROPERTY(EditDefaultsOnly, category = "Animation")
+	TSubclassOf<UAnimInstance> AnimationLayerTP;
+
+	UPROPERTY(EditDefaultsOnly, category = "Animation")
+	UAnimMontage* WeaponFire;
+
+	UPROPERTY(EditDefaultsOnly, category = "Animation")
+	UAnimMontage* WeaponFireFP;
+
+	UPROPERTY(EditDefaultsOnly, category = "Animation")
+	UAnimMontage* WeaponFireTP;
+
+#pragma endregion 
 
 public:	
-
-	FName GetSocket() const { return Socket; }
-
-	UFUNCTION(BlueprintPure)
-	USkeletalMeshComponent* GetWeaponMesh() { return Weapon; }
 
 	void HideFakeWeapon(bool HideFakeWeapon);
 
@@ -121,6 +139,25 @@ public:
 
 	void StartReload();
 
-	void StartPlay();
+	void SetupInputSystem();
+
+
+#pragma region // Get
+
+	FName GetSocket() const { return Socket; }
+
+	UFUNCTION(BlueprintPure)
+	USkeletalMeshComponent* GetWeaponMesh() const	{ return Weapon; }
+
+	TSubclassOf<UAnimInstance> GetAnimationLayerFP() const { return AnimationLayerFP; }
+
+	TSubclassOf<UAnimInstance> GetAnimationLayerTP() const { return AnimationLayerTP; }
+
+
+#pragma endregion 
+
+
+	void SetFakeWeapon(ASWeapon* WeaponValue) { FakeWeaponTP = WeaponValue; }
+
 
 };

@@ -6,6 +6,7 @@
 // Input
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
+#include "SCharacter.h"
 // Access Macro Multiplayer
 #include "Net/UnrealNetwork.h"
 
@@ -43,12 +44,6 @@ void ASWeapon::BeginPlay()
 	
 	TimeBetweenShots = 60 / RateOfFire;
 
-	
-	
-	
-
-	
-
 }
 
 void ASWeapon::OnRep_HideFakeWeapon()
@@ -63,8 +58,6 @@ void ASWeapon::OnRep_HideFakeWeapon()
 		Weapon->SetOnlyOwnerSee(true);
 		Weapon->SetOwnerNoSee(false);
 
-
-		
 	}
 	
 }
@@ -117,7 +110,7 @@ void ASWeapon::Fire()
 		if (GetWorld()->LineTraceSingleByChannel(Hit, EyeLocation, TraceEnd, ECC_Visibility, QueryParams))
 		{
 	
-		
+			//@TODO Logical system hit and damage
 
 
 			
@@ -126,6 +119,8 @@ void ASWeapon::Fire()
 
 	
 		DrawDebugLine(GetWorld(), EyeLocation, TraceEnd, FColor::White, false, 1.0f, 0, 1.0f);
+
+		PlayAnimation();
 		
 		LastFireTime = GetWorld()->TimeSeconds;
 
@@ -155,6 +150,53 @@ void ASWeapon::Fire()
 void ASWeapon::Server_Fire_Implementation()
 {
 	Fire();
+}
+
+void ASWeapon::PlayAnimation()
+{
+	UAnimInstance* AnimInstance;
+
+
+	// Montage FP //
+
+	AActor* MyOwner = GetOwner();
+	ASCharacter* MyChar = Cast<ASCharacter>(MyOwner);
+
+	AnimInstance = MyChar->GetMesh1P()->GetAnimInstance();
+
+	if (AnimInstance)
+	{
+		AnimInstance->Montage_Play(WeaponFireFP);
+	}
+
+
+	// Montage TP //
+
+	AnimInstance = MyChar->GetMesh()->GetAnimInstance();
+
+	if (AnimInstance)
+	{
+		AnimInstance->Montage_Play(WeaponFireTP);
+	}
+
+	// Montage Weapon FP// 
+
+	AnimInstance = Weapon->GetAnimInstance();
+
+	if (AnimInstance)
+	{
+		AnimInstance->Montage_Play(WeaponFire);
+	}
+
+	// Montage Weapon TP //
+
+	AnimInstance = FakeWeaponTP->GetWeaponMesh()->GetAnimInstance();
+
+	if (AnimInstance)
+	{
+		AnimInstance->Montage_Play(WeaponFire);
+	}
+
 }
 
 bool ASWeapon::CheckMunition()
@@ -264,15 +306,6 @@ void ASWeapon::StartReload()
 	Munition = MunitionMagazine;
 
 	UE_LOG(LogTemplateWeapon, Error, TEXT("'%s' Reloading"), *GetNameSafe(this));
-}
-
-void ASWeapon::StartPlay()
-{
-
-	//UE_LOG(LogTemplateWeapon, Error, TEXT("'%s %s' StartPlay"), *GetNameSafe(this), *GetNameSafe(GetOwner()));
-
-	SetupInputSystem();
-	
 }
 
 void ASWeapon::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
