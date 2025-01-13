@@ -64,7 +64,7 @@ void ASWeapon::OnRep_HideFakeWeapon()
 
 void ASWeapon::Fire()
 {
-	if (CheckMunition())
+	if (CheckMunition() || bReloading)
 	{
 		UE_LOG(LogTemplateWeapon, Error, TEXT("'%s' Munition 0"), *GetNameSafe(this));
 		return;
@@ -120,7 +120,7 @@ void ASWeapon::Fire()
 	
 		DrawDebugLine(GetWorld(), EyeLocation, TraceEnd, FColor::White, false, 1.0f, 0, 1.0f);
 
-		PlayAnimation();
+		NetMulticast_PlayAnimation(WeaponFireFP, WeaponFireTP, WeaponFire, ETypeAnimation::FIRE);
 		
 		LastFireTime = GetWorld()->TimeSeconds;
 
@@ -145,6 +145,35 @@ void ASWeapon::Fire()
 
 }
 
+void ASWeapon::Reload()
+{
+	
+	if (Munition == MunitionMagazine || bReloading == true) return;
+
+	bReloading = true;
+
+	UE_LOG(LogTemplateWeapon, Error, TEXT("'%s' Reloading"), *GetNameSafe(this));
+
+	if (HasAuthority())
+	{
+		NetMulticast_PlayAnimation(WeaponReloadFPS, WeaponReloadTPS, WeaponReload, ETypeAnimation::RELOAD);
+	}
+	else
+	{
+		Server_PlayAnimation(WeaponReloadFPS, WeaponReloadTPS, WeaponReload, ETypeAnimation::RELOAD);
+	}
+}
+
+void ASWeapon::Server_PlayAnimation_Implementation(UAnimMontage* AnimationMontageFPS, UAnimMontage* AnimationMontageTPS, UAnimMontage* AnimationMontageWeapon, ETypeAnimation TypeAnimation)
+{
+	NetMulticast_PlayAnimation(AnimationMontageFPS, AnimationMontageTPS, AnimationMontageWeapon, TypeAnimation);
+}
+
+void ASWeapon::NetMulticast_PlayAnimation_Implementation(UAnimMontage* AnimationMontageFPS, UAnimMontage* AnimationMontageTPS, UAnimMontage* AnimationMontageWeapon, ETypeAnimation TypeAnimation)
+{
+	PlayAnimation(AnimationMontageFPS, AnimationMontageTPS, AnimationMontageWeapon, TypeAnimation);
+}
+
 
 
 void ASWeapon::Server_Fire_Implementation()
@@ -152,51 +181,53 @@ void ASWeapon::Server_Fire_Implementation()
 	Fire();
 }
 
-void ASWeapon::PlayAnimation()
+void ASWeapon::PlayAnimation(UAnimMontage* AnimationMontageFPS, UAnimMontage* AnimationMontageTPS, UAnimMontage* AnimationMontageWeapon, ETypeAnimation TypeAnimation)
 {
-	UAnimInstance* AnimInstance;
-
-
-	// Montage FP //
 
 	AActor* MyOwner = GetOwner();
 	ASCharacter* MyChar = Cast<ASCharacter>(MyOwner);
 
-	AnimInstance = MyChar->GetMesh1P()->GetAnimInstance();
+	// Montage FPS //
 
-	if (AnimInstance)
+	PlayAnimationMontage(MyChar->GetAnimationInstance(EAnimationInstance::MeshFPS), AnimationMontageFPS, TypeAnimation);
+
+	// Montage TPS //
+
+	PlayAnimationMontage(MyChar->GetAnimationInstance(EAnimationInstance::MeshTPS), AnimationMontageTPS, ETypeAnimation::NONE);
+
+	// Montage Weapon FPS // 
+
+	PlayAnimationMontage(Weapon->GetAnimInstance(), AnimationMontageWeapon, ETypeAnimation::NONE);
+
+	// Montage Weapon TPS //
+
+	PlayAnimationMontage(FakeWeaponTP->GetWeaponMesh()->GetAnimInstance(), AnimationMontageWeapon, ETypeAnimation::NONE);
+
+}
+
+void ASWeapon::PlayAnimationMontage(UAnimInstance* AnimationInstance, UAnimMontage* AnimationMontage, ETypeAnimation TypeAnimation)
+{
+	if (AnimationInstance)
 	{
-		AnimInstance->Montage_Play(WeaponFireFP);
+		AnimationInstance->Montage_Play(AnimationMontage);
+
+		switch (TypeAnimation)
+		{
+		case ETypeAnimation::RELOAD:
+
+			if (!AnimationInstance->OnMontageEnded.IsBound())
+			{
+				AnimationInstanceFPS = AnimationInstance;
+				AnimationInstance->OnMontageEnded.AddDynamic(this, &ASWeapon::MontageEndedReload);
+			}	
+
+			break;
+		default:
+			break;
+		}
+
+		
 	}
-
-
-	// Montage TP //
-
-	AnimInstance = MyChar->GetMesh()->GetAnimInstance();
-
-	if (AnimInstance)
-	{
-		AnimInstance->Montage_Play(WeaponFireTP);
-	}
-
-	// Montage Weapon FP// 
-
-	AnimInstance = Weapon->GetAnimInstance();
-
-	if (AnimInstance)
-	{
-		AnimInstance->Montage_Play(WeaponFire);
-	}
-
-	// Montage Weapon TP //
-
-	AnimInstance = FakeWeaponTP->GetWeaponMesh()->GetAnimInstance();
-
-	if (AnimInstance)
-	{
-		AnimInstance->Montage_Play(WeaponFire);
-	}
-
 }
 
 bool ASWeapon::CheckMunition()
@@ -227,6 +258,10 @@ void ASWeapon::SetupInputSystem()
 			EnhancedInputComponent->BindAction(InputActions->FireAction, ETriggerEvent::Started, this, &ASWeapon::StartFire);
 			EnhancedInputComponent->BindAction(InputActions->FireAction, ETriggerEvent::Completed, this, &ASWeapon::StopFire);
 
+			// Aim
+			EnhancedInputComponent->BindAction(InputActions->AimAction, ETriggerEvent::Started, this, &ASWeapon::StartAim);
+			EnhancedInputComponent->BindAction(InputActions->AimAction, ETriggerEvent::Completed, this, &ASWeapon::StopAim);
+
 			//Reload 
 			EnhancedInputComponent->BindAction(InputActions->ReloadAction, ETriggerEvent::Started, this, &ASWeapon::StartReload);
 
@@ -256,6 +291,17 @@ void ASWeapon::EndPlay(const EEndPlayReason::Type EndPlayReason)
 	}
 	
 
+}
+
+void ASWeapon::MontageEndedReload(UAnimMontage* Montage, bool bInterrupted)
+{
+	if (!bInterrupted)
+	{
+		Munition = MunitionMagazine;
+		bReloading = false;
+		AnimationInstanceFPS->OnMontageEnded.RemoveDynamic(this, &ASWeapon::MontageEndedReload);
+	}
+	
 }
 
 void ASWeapon::HideFakeWeapon(bool HideFakeWeapon)
@@ -301,11 +347,18 @@ void ASWeapon::StopFire()
 
 void ASWeapon::StartReload()
 {
-	if (Munition == MunitionMagazine) return;
+	Reload();
+}
 
-	Munition = MunitionMagazine;
+void ASWeapon::StartAim()
+{
+	bAiming = true;
+}
 
-	UE_LOG(LogTemplateWeapon, Error, TEXT("'%s' Reloading"), *GetNameSafe(this));
+void ASWeapon::StopAim()
+{
+
+	bAiming = false;
 }
 
 void ASWeapon::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const

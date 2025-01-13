@@ -7,6 +7,17 @@
 #include "Logging/LogMacros.h"
 #include "SCharacter.generated.h"
 
+
+
+UENUM(BlueprintType)
+enum class EAnimationInstance : uint8 {
+	MeshFPS = 0 UMETA(DisplayName = "MeshFPS"),
+	MeshTPS = 1  UMETA(DisplayName = "MeshTPS"),
+	Weapon = 2	UMETA(DisplayName = "Weapon"),
+	FakeWeapon = 3 UMETA(DisplayName = "FakeWeapon")
+
+};
+
 class UInputComponent;
 class USkeletalMeshComponent;
 class UCameraComponent;
@@ -87,8 +98,11 @@ public:
 
 	/** Returns Mesh1P subobject **/
 	USkeletalMeshComponent* GetMesh1P() const { return Mesh1P; }
+
 	/** Returns FirstPersonCameraComponent subobject **/
 	UCameraComponent* GetFirstPersonCameraComponent() const { return FirstPersonCameraComponent; }
+
+	UAnimInstance* GetAnimationInstance(EAnimationInstance AnimationInstance) const;
 
 #pragma endregion 
 

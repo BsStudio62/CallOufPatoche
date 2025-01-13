@@ -113,6 +113,28 @@ void ASCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 	}
 }
 
+UAnimInstance* ASCharacter::GetAnimationInstance(EAnimationInstance AnimationInstance) const
+{
+	UAnimInstance* Animation = nullptr;
+
+	switch (AnimationInstance)
+	{
+	case EAnimationInstance::MeshFPS:
+		Animation = GetMesh1P()->GetAnimInstance();
+		break;
+	case EAnimationInstance::MeshTPS:
+		Animation = GetMesh()->GetAnimInstance();
+		break;
+	case EAnimationInstance::Weapon:
+		Animation = CurrentWeapon->GetWeaponMesh()->GetAnimInstance();
+		break;
+	default:
+		break;
+	}
+
+	return Animation;
+}
+
 void ASCharacter::Move(const FInputActionValue& Value)
 {
 	// input is a Vector2D

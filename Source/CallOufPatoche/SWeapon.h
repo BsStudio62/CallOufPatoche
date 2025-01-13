@@ -14,6 +14,15 @@ class USInputConfigWeapon;
 DECLARE_LOG_CATEGORY_EXTERN(LogTemplateWeapon, Log, All);
 
 UENUM(BlueprintType)
+enum class ETypeAnimation : uint8
+{
+	NONE		UMETA(DisplayName = "None"),
+	FIRE		UMETA(DisplayName = "Fire"),
+	RELOAD	UMETA(DisplayName = "Reload"),
+
+};
+
+UENUM(BlueprintType)
 enum class EFireMode : uint8
 {
 	SEMI		UMETA(DisplayName = "Semi"),
@@ -68,8 +77,20 @@ protected:
 
 	void Fire();
 
+	void Reload();
+
+#pragma region // Network 
+
 	UFUNCTION(Server, Reliable)
 	void Server_Fire();
+
+	UFUNCTION(NetMulticast, Reliable)
+	void NetMulticast_PlayAnimation(UAnimMontage* AnimationMontageFPS, UAnimMontage* AnimationMontageTPS, UAnimMontage* AnimationMontageWeapon, ETypeAnimation TypeAnimation);
+
+	UFUNCTION(Server, Reliable)
+	void Server_PlayAnimation(UAnimMontage* AnimationMontageFPS, UAnimMontage* AnimationMontageTPS, UAnimMontage* AnimationMontageWeapon, ETypeAnimation TypeAnimation);
+
+#pragma endregion 
 
 	FTimerHandle TimerHandle_TimeBetweenShots;
 
@@ -91,7 +112,10 @@ protected:
 	UPROPERTY(EditDefaultsOnly)
 	float DistanceFire;
 
+	UPROPERTY(BlueprintReadOnly)
 	bool bAiming;
+
+	bool bReloading;
 
 	UPROPERTY(EditDefaultsOnly)
 	int32 Munition;
@@ -102,13 +126,18 @@ protected:
 	UPROPERTY(EditDefaultsOnly)
 	int32 MagazineCapacity;
 
-	void PlayAnimation();
+	void PlayAnimation(UAnimMontage* AnimationMontageFPS, UAnimMontage* AnimationMontageTPS, UAnimMontage* AnimationMontageWeapon, ETypeAnimation TypeAnimation);
 
-	// Verification Munition not egal 0 //
+	void PlayAnimationMontage(UAnimInstance* AnimationInstance, UAnimMontage* AnimationMontage, ETypeAnimation TypeAnimation);
+
+	// Check Munition not egal 0 //
 	bool CheckMunition();
 
 	UFUNCTION()
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
+
+	UFUNCTION()
+	virtual void MontageEndedReload(UAnimMontage* Montage, bool bInterrupted);
 
 #pragma region // Animation
 
@@ -127,7 +156,21 @@ protected:
 	UPROPERTY(EditDefaultsOnly, category = "Animation")
 	UAnimMontage* WeaponFireTP;
 
+	UPROPERTY(EditDefaultsOnly, category = "Animation")
+	UAnimMontage* WeaponReload;
+
+	UPROPERTY(EditDefaultsOnly, category = "Animation")
+	UAnimMontage* WeaponReloadFPS;
+
+	UPROPERTY(EditDefaultsOnly, category = "Animation")
+	UAnimMontage* WeaponReloadTPS;
+
+	UAnimInstance* AnimationInstanceFPS;
+
+
 #pragma endregion 
+
+
 
 public:	
 
@@ -138,6 +181,10 @@ public:
 	void StopFire();
 
 	void StartReload();
+
+	void StartAim();
+
+	void StopAim();
 
 	void SetupInputSystem();
 
