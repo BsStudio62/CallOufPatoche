@@ -7,10 +7,16 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "SCharacter.h"
+// Access Collision & Surface
+#include "CallOufPatoche.h"
+#include "PhysicalMaterials/PhysicalMaterial.h"
 // Access Macro Multiplayer
 #include "Net/UnrealNetwork.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateWeapon);
+
+static int32 DebugWeaponDrawing = 0;
+FAutoConsoleVariableRef CVARDebugWeaponDrawing(TEXT("COOP.DebugWeapons"),DebugWeaponDrawing,TEXT("Draw Debug Lines for Weapons"),ECVF_Cheat);
 
 // Sets default values
 ASWeapon::ASWeapon()
@@ -104,22 +110,43 @@ void ASWeapon::Fire()
 		FCollisionQueryParams QueryParams;
 		QueryParams.AddIgnoredActor(MyOwner);
 		QueryParams.AddIgnoredActor(this);
+		QueryParams.bTraceComplex = true;
+		QueryParams.bReturnPhysicalMaterial = true;
 
 		FHitResult Hit;
 
-		if (GetWorld()->LineTraceSingleByChannel(Hit, EyeLocation, TraceEnd, ECC_Visibility, QueryParams))
+		EPhysicalSurface SurfaceType = SurfaceType_Default;
+		FColor ColorHit;
+
+		if (GetWorld()->LineTraceSingleByChannel(Hit, EyeLocation, TraceEnd, COLLISION_WEAPON, QueryParams))
 		{
 	
 			//@TODO Logical system hit and damage
 
+			SurfaceType = UPhysicalMaterial::DetermineSurfaceType(Hit.PhysMaterial.Get());
 
+			if (SurfaceType == SURFACE_FLESHVULNERABLE)
+			{
+				ColorHit = FColor::Red;
+			}
+			else
+			{
+				ColorHit = FColor::Blue;
+			}
+
+			if (DebugWeaponDrawing > 0)
+			{
+				DrawDebugSphere(GetWorld(), Hit.Location, 10.0f, 10, ColorHit, false, 1.0f, 0, 1.0f);
+			}
 			
 
 		}
 
-	
-		DrawDebugLine(GetWorld(), EyeLocation, TraceEnd, FColor::White, false, 1.0f, 0, 1.0f);
-
+		if (DebugWeaponDrawing > 0)
+		{
+			DrawDebugLine(GetWorld(), EyeLocation, TraceEnd, FColor::White, false, 1.0f, 0, 1.0f);
+		}
+		
 		NetMulticast_PlayAnimation(WeaponFireFP, WeaponFireTP, WeaponFire, ETypeAnimation::FIRE);
 		
 		LastFireTime = GetWorld()->TimeSeconds;
@@ -173,8 +200,6 @@ void ASWeapon::NetMulticast_PlayAnimation_Implementation(UAnimMontage* Animation
 {
 	PlayAnimation(AnimationMontageFPS, AnimationMontageTPS, AnimationMontageWeapon, TypeAnimation);
 }
-
-
 
 void ASWeapon::Server_Fire_Implementation()
 {
