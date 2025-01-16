@@ -30,6 +30,8 @@ enum class EFireMode : uint8
 	AUTO      UMETA(DisplayName = "Auto"),
 };
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnFire);
+
 UCLASS()
 class CALLOUFPATOCHE_API ASWeapon : public AActor
 {
@@ -117,10 +119,10 @@ protected:
 
 	bool bReloading;
 
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	int32 Munition;
 
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	int32 MunitionMagazine;
 
 	UPROPERTY(EditDefaultsOnly)
@@ -187,6 +189,9 @@ public:
 	void StopAim();
 
 	void SetupInputSystem();
+
+	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category = "Events")
+	FOnFire OnFire;
 
 
 #pragma region // Get

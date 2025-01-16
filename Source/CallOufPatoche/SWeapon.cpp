@@ -153,6 +153,8 @@ void ASWeapon::Fire()
 
 		Munition--;
 
+		OnFire.Broadcast();
+
 		// Mode burst //
 
 		if (FireModeSelected == EFireMode::RAFALE)
@@ -323,6 +325,7 @@ void ASWeapon::MontageEndedReload(UAnimMontage* Montage, bool bInterrupted)
 	if (!bInterrupted)
 	{
 		Munition = MunitionMagazine;
+		OnFire.Broadcast();
 		bReloading = false;
 		AnimationInstanceFPS->OnMontageEnded.RemoveDynamic(this, &ASWeapon::MontageEndedReload);
 	}
