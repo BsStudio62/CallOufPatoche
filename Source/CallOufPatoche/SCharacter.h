@@ -7,8 +7,6 @@
 #include "Logging/LogMacros.h"
 #include "SCharacter.generated.h"
 
-
-
 UENUM(BlueprintType)
 enum class EAnimationInstance : uint8 {
 	MeshFPS = 0 UMETA(DisplayName = "MeshFPS"),
@@ -45,6 +43,18 @@ class CALLOUFPATOCHE_API ASCharacter : public ACharacter
 	/** MappingContext */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
 	UInputMappingContext* CharacterMappingContext;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "IK", meta = (AllowPrivateAccess = "true"))
+	USceneComponent* HandL;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "IK", meta = (AllowPrivateAccess = "true"))
+	USceneComponent* HandR;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "IK", meta = (AllowPrivateAccess = "true"))
+	USceneComponent* HandLAds;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "IK", meta = (AllowPrivateAccess = "true"))
+	USceneComponent* HandRAds;
 	
 public:
 
@@ -82,12 +92,14 @@ protected:
 	/** Called for looking input */
 	void Look(const FInputActionValue& Value);
 
-
 	void StartDelayed();
 
 	void SetupAnimationLayer();
 
+	void InitializationIkSystem();
+
 protected:
+
 	// APawn interface
 	virtual void SetupPlayerInputComponent(UInputComponent* InputComponent) override;
 	// End of APawn interface

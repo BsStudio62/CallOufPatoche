@@ -35,6 +35,8 @@ ASWeapon::ASWeapon()
 	Weapon->bCastDynamicShadow = false;
 	Weapon->CastShadow = false;
 
+	bIkAds = false;
+
 	BulletSpread = 2.0f;
 	RateOfFire = 600;
 	DistanceFire = 10000.0f;

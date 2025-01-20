@@ -60,6 +60,16 @@ protected:
 	UPROPERTY(VisibleDefaultsOnly, Category = Mesh)
 	USkeletalMeshComponent* Weapon;
 
+	// Ik System
+	UPROPERTY(EditDefaultsOnly,  Category = "IK | ADS")
+	FTransform HandLIkAds;
+
+	UPROPERTY(EditDefaultsOnly, Category = "IK | ADS")
+	FTransform HandRIkAds;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "IK | ADS")
+	bool bIkAds;
+
 	ASWeapon* FakeWeaponTP;
 
 	UPROPERTY(EditDefaultsOnly)
@@ -210,6 +220,9 @@ public:
 
 	TSubclassOf<UAnimInstance> GetAnimationLayerTP() const { return AnimationLayerTPS; }
 
+	FTransform GetHandLIkAds() const { return HandLIkAds; }
+
+	FTransform GetHandRIkAds() const { return HandRIkAds; }
 
 #pragma endregion 
 

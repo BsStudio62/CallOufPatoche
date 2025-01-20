@@ -40,6 +40,18 @@ ASCharacter::ASCharacter()
 	Mesh1P->SetRelativeRotation(FRotator(0.0f, -90.0f, 0.0f));
 	Mesh1P->SetRelativeLocation(FVector(-10.f, 0.f, -158.f));
 
+
+	// Create scene component for IK system
+	HandL = CreateDefaultSubobject<USceneComponent>(TEXT("HandL"));
+	HandL->SetupAttachment(Mesh1P);
+	HandR = CreateDefaultSubobject<USceneComponent>(TEXT("HandR"));
+	HandR->SetupAttachment(Mesh1P);
+	HandLAds = CreateDefaultSubobject<USceneComponent>(TEXT("HandLAds"));
+	HandLAds->SetupAttachment(Mesh1P);
+	HandRAds = CreateDefaultSubobject<USceneComponent>(TEXT("HandRAds"));
+	HandRAds->SetupAttachment(Mesh1P);
+	
+
 }
 
 void ASCharacter::CreateWeapon()
@@ -169,6 +181,8 @@ void ASCharacter::StartDelayed()
 
 	CurrentWeapon->SetFakeWeapon(FakeWeapon);
 
+	InitializationIkSystem();
+
 }
 
 void ASCharacter::SetupAnimationLayer()
@@ -183,6 +197,18 @@ void ASCharacter::SetupAnimationLayer()
 
 	//Setup Layer TP
 	GetMesh()->LinkAnimClassLayers(CurrentWeapon->GetAnimationLayerTP());
+
+}
+
+void ASCharacter::InitializationIkSystem()
+{
+	if (CurrentWeapon)
+	{
+		HandLAds->SetRelativeTransform(CurrentWeapon->GetHandLIkAds());
+
+		HandRAds->SetRelativeTransform(CurrentWeapon->GetHandRIkAds());
+
+	}
 
 }
 
