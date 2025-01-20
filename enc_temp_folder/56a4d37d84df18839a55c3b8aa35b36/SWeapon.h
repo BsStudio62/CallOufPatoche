@@ -180,6 +180,8 @@ protected:
 
 #pragma endregion 
 
+
+
 public:	
 
 	void HideFakeWeapon(bool HideFakeWeapon);
@@ -199,6 +201,8 @@ public:
 	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category = "Events")
 	FOnFire OnFire;
 
+
+
 #pragma region // Get
 
 	FName GetSocket() const { return Socket; }
@@ -213,6 +217,8 @@ public:
 
 #pragma endregion 
 
+
 	void SetFakeWeapon(ASWeapon* WeaponValue) { FakeWeaponTP = WeaponValue; }
+
 
 };

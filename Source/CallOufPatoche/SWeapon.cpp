@@ -96,10 +96,10 @@ void ASWeapon::Fire()
 
 		FVector ShotDirection = EyeRotation.Vector();
 
-		// Bullet Spread
-
+		// Remove Bullet Spread in Aiming
 		if (!bAiming)
 		{
+			// Bullet Spread
 			float HalfRad = FMath::DegreesToRadians(BulletSpread);
 			ShotDirection = FMath::VRandCone(ShotDirection, HalfRad, HalfRad);
 		}
@@ -147,7 +147,14 @@ void ASWeapon::Fire()
 			DrawDebugLine(GetWorld(), EyeLocation, TraceEnd, FColor::White, false, 1.0f, 0, 1.0f);
 		}
 		
-		NetMulticast_PlayAnimation(WeaponFireFP, WeaponFireTP, WeaponFire, ETypeAnimation::FIRE);
+		if (bAiming)
+		{
+			NetMulticast_PlayAnimation(WeaponFireAdsFPS, WeaponFireTPS, WeaponFire, ETypeAnimation::FIRE);
+		}
+		else
+		{
+			NetMulticast_PlayAnimation(WeaponFireFPS, WeaponFireTPS, WeaponFire, ETypeAnimation::FIRE);
+		}
 		
 		LastFireTime = GetWorld()->TimeSeconds;
 
@@ -234,7 +241,7 @@ void ASWeapon::PlayAnimation(UAnimMontage* AnimationMontageFPS, UAnimMontage* An
 
 void ASWeapon::PlayAnimationMontage(UAnimInstance* AnimationInstance, UAnimMontage* AnimationMontage, ETypeAnimation TypeAnimation)
 {
-	if (AnimationInstance)
+	if (AnimationInstance && AnimationMontage)
 	{
 		AnimationInstance->Montage_Play(AnimationMontage);
 
@@ -242,11 +249,20 @@ void ASWeapon::PlayAnimationMontage(UAnimInstance* AnimationInstance, UAnimMonta
 		{
 		case ETypeAnimation::RELOAD:
 
+			
+
+			if (!AnimationInstance->OnPlayMontageNotifyBegin.IsBound())
+			{
+				AnimationInstance->OnPlayMontageNotifyBegin.AddDynamic(this, &ASWeapon::MontageNotifyBeginReload);
+			}
+
 			if (!AnimationInstance->OnMontageEnded.IsBound())
 			{
-				AnimationInstanceFPS = AnimationInstance;
+				
 				AnimationInstance->OnMontageEnded.AddDynamic(this, &ASWeapon::MontageEndedReload);
 			}	
+
+			AnimationInstanceFPS = AnimationInstance;
 
 			break;
 		default:
@@ -259,12 +275,7 @@ void ASWeapon::PlayAnimationMontage(UAnimInstance* AnimationInstance, UAnimMonta
 
 bool ASWeapon::CheckMunition()
 {
-	if (Munition == 0)
-	{
-		return true;
-	}
-
-	return false;
+	return Munition == 0;
 }
 
 void ASWeapon::SetupInputSystem()
@@ -330,6 +341,12 @@ void ASWeapon::MontageEndedReload(UAnimMontage* Montage, bool bInterrupted)
 		AnimationInstanceFPS->OnMontageEnded.RemoveDynamic(this, &ASWeapon::MontageEndedReload);
 	}
 	
+}
+
+void ASWeapon::MontageNotifyBeginReload(FName NotifyName, const FBranchingPointNotifyPayload& BranchingPointNotifyPayload)
+{
+	UE_LOG(LogTemplateWeapon, Log, TEXT("MontageNotifyBeginReload triggered with NotifyName: %s"), *NotifyName.ToString());
+	//AnimationInstanceFPS->OnPlayMontageNotifyBegin.RemoveDynamic(this, &ASWeapon::MontageNotifyBeginReload);
 }
 
 void ASWeapon::HideFakeWeapon(bool HideFakeWeapon)
