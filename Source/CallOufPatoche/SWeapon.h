@@ -91,6 +91,10 @@ protected:
 
 	void Reload();
 
+	//sound
+	UPROPERTY(EditdefaultsOnly)
+	USoundBase* FireSound;
+
 #pragma region // Network 
 
 	UFUNCTION(Server, Reliable)

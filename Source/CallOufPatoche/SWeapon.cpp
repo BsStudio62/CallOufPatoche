@@ -10,6 +10,7 @@
 // Access Collision & Surface
 #include "CallOufPatoche.h"
 #include "PhysicalMaterials/PhysicalMaterial.h"
+#include "Kismet/GameplayStatics.h"
 // Access Macro Multiplayer
 #include "Net/UnrealNetwork.h"
 
@@ -149,9 +150,17 @@ void ASWeapon::Fire()
 			DrawDebugLine(GetWorld(), EyeLocation, TraceEnd, FColor::White, false, 1.0f, 0, 1.0f);
 		}
 		
+	
 		if (bAiming)
 		{
-			NetMulticast_PlayAnimation(WeaponFireAdsFPS, WeaponFireTPS, WeaponFire, ETypeAnimation::FIRE);
+			if (!bIkAds)
+			{
+				NetMulticast_PlayAnimation(WeaponFireAdsFPS, WeaponFireTPS, WeaponFire, ETypeAnimation::FIRE);
+			}
+			else
+			{
+				UGameplayStatics::PlaySoundAtLocation(this, FireSound, GetActorLocation());
+			}
 		}
 		else
 		{
