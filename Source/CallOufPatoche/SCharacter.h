@@ -116,6 +116,8 @@ public:
 
 	UAnimInstance* GetAnimationInstance(EAnimationInstance AnimationInstance) const;
 
+	ASWeapon* GetWeapon() const { return CurrentWeapon; }
+
 #pragma endregion 
 
 };

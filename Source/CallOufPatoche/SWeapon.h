@@ -57,7 +57,7 @@ protected:
 #pragma endregion 
 
 	/** Weapon Mesh */
-	UPROPERTY(VisibleDefaultsOnly, Category = Mesh)
+	UPROPERTY(VisibleDefaultsOnly, Category = "Mesh")
 	USkeletalMeshComponent* Weapon;
 
 	// Ik System
@@ -91,8 +91,10 @@ protected:
 
 	void Reload();
 
-	//sound
-	UPROPERTY(EditdefaultsOnly)
+	void PlayEffectWeapon();
+
+	// SFX
+	UPROPERTY(EditdefaultsOnly, Category = "SFX")
 	USoundBase* FireSound;
 
 #pragma region // Network 
@@ -105,6 +107,9 @@ protected:
 
 	UFUNCTION(Server, Reliable)
 	void Server_PlayAnimation(UAnimMontage* AnimationMontageFPS, UAnimMontage* AnimationMontageTPS, UAnimMontage* AnimationMontageWeapon, ETypeAnimation TypeAnimation);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void NetMulticast_PlayEffectWeapon();
 
 #pragma endregion 
 
@@ -227,6 +232,8 @@ public:
 	FTransform GetHandLIkAds() const { return HandLIkAds; }
 
 	FTransform GetHandRIkAds() const { return HandRIkAds; }
+
+	UAnimInstance* GetAnimationInstance() const { return Weapon->GetAnimInstance(); }
 
 #pragma endregion 
 

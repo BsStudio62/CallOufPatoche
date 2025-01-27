@@ -17,7 +17,7 @@
 DEFINE_LOG_CATEGORY(LogTemplateWeapon);
 
 static int32 DebugWeaponDrawing = 0;
-FAutoConsoleVariableRef CVARDebugWeaponDrawing(TEXT("COOP.DebugWeapons"),DebugWeaponDrawing,TEXT("Draw Debug Lines for Weapons"),ECVF_Cheat);
+FAutoConsoleVariableRef CVARDebugWeaponDrawing(TEXT("Weapon.DebugWeapons"),DebugWeaponDrawing,TEXT("Draw Debug Lines for Weapons"),ECVF_Cheat);
 
 // Sets default values
 ASWeapon::ASWeapon()
@@ -159,7 +159,14 @@ void ASWeapon::Fire()
 			}
 			else
 			{
-				UGameplayStatics::PlaySoundAtLocation(this, FireSound, GetActorLocation());
+
+				ASCharacter* Char = Cast<ASCharacter>(MyOwner);
+
+				if (Char)
+				{
+					UGameplayStatics::SpawnSoundAttached(FireSound, Char->GetMesh1P(), Socket, FVector(ForceInit), EAttachLocation::SnapToTarget);
+				}
+
 			}
 		}
 		else
@@ -211,6 +218,16 @@ void ASWeapon::Reload()
 	}
 }
 
+void ASWeapon::PlayEffectWeapon()
+{
+	UGameplayStatics::PlaySoundAtLocation(this, FireSound, GetActorLocation());
+}
+
+void ASWeapon::NetMulticast_PlayEffectWeapon_Implementation()
+{
+	PlayEffectWeapon();
+}
+
 void ASWeapon::Server_PlayAnimation_Implementation(UAnimMontage* AnimationMontageFPS, UAnimMontage* AnimationMontageTPS, UAnimMontage* AnimationMontageWeapon, ETypeAnimation TypeAnimation)
 {
 	NetMulticast_PlayAnimation(AnimationMontageFPS, AnimationMontageTPS, AnimationMontageWeapon, TypeAnimation);
@@ -242,7 +259,7 @@ void ASWeapon::PlayAnimation(UAnimMontage* AnimationMontageFPS, UAnimMontage* An
 
 	// Montage Weapon FPS // 
 
-	PlayAnimationMontage(Weapon->GetAnimInstance(), AnimationMontageWeapon, ETypeAnimation::NONE);
+	//PlayAnimationMontage(Weapon->GetAnimInstance(), AnimationMontageWeapon, ETypeAnimation::NONE);
 
 	// Montage Weapon TPS //
 
