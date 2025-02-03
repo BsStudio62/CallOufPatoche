@@ -320,26 +320,22 @@ bool ASWeapon::CheckMunition()
 
 int32 ASWeapon::CalculateMunition()
 {
-
-	// Calcul nb de balle à recharger
+	// Calcul du nombre de balles à recharger
 	int32 MunitionRemain = MagazineCapacity - Munition;
 
-	if (MunitionMagazine >= MagazineCapacity)
+	if (MunitionMagazine >= MunitionRemain)
 	{
+		// Assez de munitions pour un rechargement complet
 		MunitionMagazine -= MunitionRemain;
-
 		return MunitionRemain;
 	}
-	else 
+	else
 	{
-		//  2 = 5 - 3
-		int32 MunitionRemainCalcul = MunitionRemain - MunitionMagazine;
-
-		MunitionMagazine -= MunitionMagazine;
-
-		return MunitionRemainCalcul;
+		// On recharge ce qu'on peut avec les munitions restantes
+		int32 MunitionUsed = MunitionMagazine;
+		MunitionMagazine = 0;
+		return MunitionUsed;
 	}
-	
 
 	return 0;
 }
