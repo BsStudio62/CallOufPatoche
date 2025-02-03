@@ -44,6 +44,11 @@ ASWeapon::ASWeapon()
 	NbFireBurstMax = 3;
 	NbFireBurst = 1;
 
+	//Munition
+	Munition = 100;
+	MunitionMagazine = 100;
+	MunitionMagazineMax = 100;
+
 }
 
 // Called when the game starts or when spawned
@@ -89,6 +94,10 @@ void ASWeapon::Fire()
 	}
 
 	AActor* MyOwner = GetOwner();
+
+	ASCharacter* Char = Cast<ASCharacter>(MyOwner);
+
+	APlayerController* PC = MyOwner->GetInstigatorController<APlayerController>();
 
 	if (MyOwner)
 	{
@@ -149,18 +158,22 @@ void ASWeapon::Fire()
 		{
 			DrawDebugLine(GetWorld(), EyeLocation, TraceEnd, FColor::White, false, 1.0f, 0, 1.0f);
 		}
-		
+
+		if (PC && CameraShakeFire)
+		{
+			PC->ClientStartCameraShake(CameraShakeFire);
+		}
 	
 		if (bAiming)
 		{
 			if (!bIkAds)
 			{
-				NetMulticast_PlayAnimation(WeaponFireAdsFPS, WeaponFireTPS, WeaponFire, ETypeAnimation::FIRE);
+				NetMulticast_PlayAnimation(WeaponFireAdsFPS, WeaponFireTPS, nullptr, ETypeAnimation::FIRE);
 			}
 			else
 			{
 
-				ASCharacter* Char = Cast<ASCharacter>(MyOwner);
+				
 
 				if (Char)
 				{
@@ -171,7 +184,7 @@ void ASWeapon::Fire()
 		}
 		else
 		{
-			NetMulticast_PlayAnimation(WeaponFireFPS, WeaponFireTPS, WeaponFire, ETypeAnimation::FIRE);
+			NetMulticast_PlayAnimation(WeaponFireFPS, WeaponFireTPS, nullptr, ETypeAnimation::FIRE);
 		}
 		
 		LastFireTime = GetWorld()->TimeSeconds;
@@ -179,6 +192,8 @@ void ASWeapon::Fire()
 		Munition--;
 
 		OnFire.Broadcast();
+
+		
 
 		// Mode burst //
 
@@ -202,7 +217,7 @@ void ASWeapon::Fire()
 void ASWeapon::Reload()
 {
 	
-	if (Munition == MunitionMagazine || bReloading == true) return;
+	if (MunitionMagazine == 0 || bReloading == true || Munition == MagazineCapacity) return;
 
 	bReloading = true;
 
@@ -210,11 +225,11 @@ void ASWeapon::Reload()
 
 	if (HasAuthority())
 	{
-		NetMulticast_PlayAnimation(WeaponReloadFPS, WeaponReloadTPS, WeaponReload, ETypeAnimation::RELOAD);
+		NetMulticast_PlayAnimation(WeaponReloadFPS, WeaponReloadTPS, nullptr, ETypeAnimation::RELOAD);
 	}
 	else
 	{
-		Server_PlayAnimation(WeaponReloadFPS, WeaponReloadTPS, WeaponReload, ETypeAnimation::RELOAD);
+		Server_PlayAnimation(WeaponReloadFPS, WeaponReloadTPS, nullptr, ETypeAnimation::RELOAD);
 	}
 }
 
@@ -257,8 +272,7 @@ void ASWeapon::PlayAnimation(UAnimMontage* AnimationMontageFPS, UAnimMontage* An
 
 	PlayAnimationMontage(MyChar->GetAnimationInstance(EAnimationInstance::MeshTPS), AnimationMontageTPS, ETypeAnimation::NONE);
 
-	// Montage Weapon FPS // 
-
+	// Montage Weapon FPS // Replace animation montage FPS
 	//PlayAnimationMontage(Weapon->GetAnimInstance(), AnimationMontageWeapon, ETypeAnimation::NONE);
 
 	// Montage Weapon TPS //
@@ -276,8 +290,6 @@ void ASWeapon::PlayAnimationMontage(UAnimInstance* AnimationInstance, UAnimMonta
 		switch (TypeAnimation)
 		{
 		case ETypeAnimation::RELOAD:
-
-			
 
 			if (!AnimationInstance->OnPlayMontageNotifyBegin.IsBound())
 			{
@@ -304,6 +316,53 @@ void ASWeapon::PlayAnimationMontage(UAnimInstance* AnimationInstance, UAnimMonta
 bool ASWeapon::CheckMunition()
 {
 	return Munition == 0;
+}
+
+int32 ASWeapon::CalculateMunition()
+{
+
+	// Calcul nb de balle à recharger
+	int32 MunitionRemain = MagazineCapacity - Munition;
+
+	if (MunitionMagazine >= MagazineCapacity)
+	{
+		MunitionMagazine -= MunitionRemain;
+
+		return MunitionRemain;
+	}
+	else 
+	{
+		//  2 = 5 - 3
+		int32 MunitionRemainCalcul = MunitionRemain - MunitionMagazine;
+
+		MunitionMagazine -= MunitionMagazine;
+
+		return MunitionRemainCalcul;
+	}
+	
+
+	return 0;
+}
+
+void ASWeapon::RefillMunitionMax(AActor* OwnerChar)
+{
+
+	ASCharacter* Pawn = Cast<ASCharacter>(OwnerChar);
+
+	if (Pawn)
+	{
+		ASWeapon* Weapon = Pawn->GetWeapon();
+			
+		if (Weapon)
+		{
+			Weapon->Munition = Weapon->MagazineCapacity;
+			Weapon->MunitionMagazine = Weapon->MunitionMagazineMax;
+			Weapon->OnFire.Broadcast();
+		}
+		
+	}
+
+	
 }
 
 void ASWeapon::SetupInputSystem()
@@ -363,9 +422,12 @@ void ASWeapon::MontageEndedReload(UAnimMontage* Montage, bool bInterrupted)
 {
 	if (!bInterrupted)
 	{
-		Munition = MunitionMagazine;
+
+		Munition += CalculateMunition();
 		OnFire.Broadcast();
-		bReloading = false;
+		bReloading = false;		
+
+		// Unbound Dynamic
 		AnimationInstanceFPS->OnMontageEnded.RemoveDynamic(this, &ASWeapon::MontageEndedReload);
 	}
 	

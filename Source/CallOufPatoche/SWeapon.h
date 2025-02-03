@@ -97,6 +97,10 @@ protected:
 	UPROPERTY(EditdefaultsOnly, Category = "SFX")
 	USoundBase* FireSound;
 
+	//CameraShake
+	UPROPERTY(EditdefaultsOnly, Category = "CameraShake")
+	TSubclassOf<UCameraShakeBase> CameraShakeFire;
+
 #pragma region // Network 
 
 	UFUNCTION(Server, Reliable)
@@ -138,30 +142,34 @@ protected:
 
 	bool bReloading;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+#pragma region // Munition
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Munition")
 	int32 Munition;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Munition")
 	int32 MunitionMagazine;
 
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Munition")
+	int32 MunitionMagazineMax;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Munition")
 	int32 MagazineCapacity;
-
-	void PlayAnimation(UAnimMontage* AnimationMontageFPS, UAnimMontage* AnimationMontageTPS, UAnimMontage* AnimationMontageWeapon, ETypeAnimation TypeAnimation);
-
-	void PlayAnimationMontage(UAnimInstance* AnimationInstance, UAnimMontage* AnimationMontage, ETypeAnimation TypeAnimation);
 
 	// Check Munition not egal 0 //
 	bool CheckMunition();
 
+	int32 CalculateMunition();
+
+	public : 
+
+	UFUNCTION(BlueprintCallable)
+	static void RefillMunitionMax(AActor* OwnerChar);
+
+#pragma endregion
+
 	UFUNCTION()
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
-
-	UFUNCTION()
-	virtual void MontageEndedReload(UAnimMontage* Montage, bool bInterrupted);
-
-	UFUNCTION()
-	virtual void MontageNotifyBeginReload(FName NotifyName, const FBranchingPointNotifyPayload& BranchingPointNotifyPayload);
 
 #pragma region // Animation
 
@@ -172,9 +180,6 @@ protected:
 	TSubclassOf<UAnimInstance> AnimationLayerTPS;
 
 	UPROPERTY(EditDefaultsOnly, category = "Animation | Fire")
-	UAnimMontage* WeaponFire;
-
-	UPROPERTY(EditDefaultsOnly, category = "Animation | Fire")
 	UAnimMontage* WeaponFireFPS;
 
 	UPROPERTY(EditDefaultsOnly, category = "Animation | Fire")
@@ -182,10 +187,6 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, category = "Animation | FireAds")
 	UAnimMontage* WeaponFireAdsFPS;
-
-	//Animation Reload
-	UPROPERTY(EditDefaultsOnly, category = "Animation | Reload")
-	UAnimMontage* WeaponReload;
 
 	UPROPERTY(EditDefaultsOnly, category = "Animation | Reload")
 	UAnimMontage* WeaponReloadFPS;
@@ -196,6 +197,15 @@ protected:
 
 	UAnimInstance* AnimationInstanceFPS;
 
+	void PlayAnimation(UAnimMontage* AnimationMontageFPS, UAnimMontage* AnimationMontageTPS, UAnimMontage* AnimationMontageWeapon, ETypeAnimation TypeAnimation);
+
+	void PlayAnimationMontage(UAnimInstance* AnimationInstance, UAnimMontage* AnimationMontage, ETypeAnimation TypeAnimation);
+
+	UFUNCTION()
+	virtual void MontageEndedReload(UAnimMontage* Montage, bool bInterrupted);
+
+	UFUNCTION()
+	virtual void MontageNotifyBeginReload(FName NotifyName, const FBranchingPointNotifyPayload& BranchingPointNotifyPayload);
 
 #pragma endregion 
 
