@@ -128,14 +128,17 @@ protected:
 
 	float TimeBetweenShots;
 
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditDefaultsOnly, category = "Setting Weapon")
 	float RateOfFire;
 
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditDefaultsOnly, category = "Setting Weapon")
 	float BulletSpread;
 
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditDefaultsOnly, category = "Setting Weapon")
 	float DistanceFire;
+
+	UPROPERTY(EditDefaultsOnly, category = "Setting Weapon")
+	float WeaponDamage;
 
 	UPROPERTY(BlueprintReadOnly)
 	bool bAiming;

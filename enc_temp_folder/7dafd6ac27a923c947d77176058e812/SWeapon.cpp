@@ -135,8 +135,6 @@ void ASWeapon::Fire()
 		if (GetWorld()->LineTraceSingleByChannel(Hit, EyeLocation, TraceEnd, COLLISION_WEAPON, QueryParams))
 		{
 	
-			float Damage;
-
 			//@TODO Logical system hit and damage
 			AActor* HitActor = Hit.GetActor();
 
@@ -145,16 +143,10 @@ void ASWeapon::Fire()
 			if (SurfaceType == SURFACE_FLESHVULNERABLE)
 			{
 				ColorHit = FColor::Red;
-
-				Damage = WeaponDamage * 10.0f;
-
-				UE_LOG(LogTemp, Log, TEXT("Weapon Damage: %s"), *FString::SanitizeFloat(WeaponDamage));
 			}
 			else
 			{
 				ColorHit = FColor::Blue;
-
-				Damage = WeaponDamage;
 			}
 
 			if (DebugWeaponDrawing > 0)
@@ -163,7 +155,7 @@ void ASWeapon::Fire()
 			}
 			
 
-			UGameplayStatics::ApplyPointDamage(HitActor, Damage, ShotDirection, Hit, MyOwner->GetInstigatorController(), GetOwner(), UDamageType::StaticClass());
+			UGameplayStatics::ApplyPointDamage(HitActor, WeaponDamage, ShotDirection, Hit, MyOwner->GetInstigatorController(), GetOwner(), UDamageType::StaticClass());
 
 		}
 
