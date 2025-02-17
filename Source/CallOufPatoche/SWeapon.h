@@ -18,6 +18,7 @@ enum class ETypeAnimation : uint8
 {
 	NONE		UMETA(DisplayName = "None"),
 	FIRE		UMETA(DisplayName = "Fire"),
+	FIRESIGHT		UMETA(DisplayName = "Fire Sight"),
 	RELOAD	UMETA(DisplayName = "Reload"),
 
 };
@@ -72,6 +73,7 @@ protected:
 
 	ASWeapon* FakeWeaponTP;
 
+	// Socket Weapon Attach
 	UPROPERTY(EditDefaultsOnly)
 	FName Socket;
 

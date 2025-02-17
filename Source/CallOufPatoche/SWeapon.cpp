@@ -177,36 +177,31 @@ void ASWeapon::Fire()
 			PC->ClientStartCameraShake(CameraShakeFire);
 		}
 	
+		// Aiming
 		if (bAiming)
 		{
 			if (!bIkAds)
 			{
-				NetMulticast_PlayAnimation(WeaponFireAdsFPS, WeaponFireTPS, nullptr, ETypeAnimation::FIRE);
+				NetMulticast_PlayAnimation(WeaponFireAdsFPS, WeaponFireTPS, nullptr, ETypeAnimation::FIRESIGHT);
 			}
-			else
-			{
 
-				
-
-				if (Char)
-				{
-					UGameplayStatics::SpawnSoundAttached(FireSound, Char->GetMesh1P(), Socket, FVector(ForceInit), EAttachLocation::SnapToTarget);
-				}
-
-			}
 		}
 		else
 		{
 			NetMulticast_PlayAnimation(WeaponFireFPS, WeaponFireTPS, nullptr, ETypeAnimation::FIRE);
 		}
-		
+
+		// Play sound
+		if (Char)
+		{
+			UGameplayStatics::SpawnSoundAttached(FireSound, Char->GetMesh1P(), Socket, FVector(ForceInit), EAttachLocation::SnapToTarget);
+		}
+
 		LastFireTime = GetWorld()->TimeSeconds;
 
 		Munition--;
 
 		OnFire.Broadcast();
-
-		
 
 		// Mode burst //
 

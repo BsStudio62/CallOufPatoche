@@ -15,6 +15,9 @@ public:
 
 	ASGameMode();
 
+	UPROPERTY(EditAnywhere, Category="Teste")
+	bool TEste;
+
 };
 
 
