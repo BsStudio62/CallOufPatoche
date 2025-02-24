@@ -18,6 +18,8 @@ public:
 	// Sets default values for this component's properties
 	USAttributeComponent();
 
+	static USAttributeComponent* GetComponentAttribute(AActor* Actor);
+
 protected:
 
 	// Called when the game starts
@@ -56,5 +58,8 @@ public:
 
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+
+	// Return player dead or not
+	bool GetPlayerIsAlive() { return bIsDead; }
 
 };

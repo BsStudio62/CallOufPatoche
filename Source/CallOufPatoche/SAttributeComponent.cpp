@@ -18,6 +18,13 @@ USAttributeComponent::USAttributeComponent()
 	SetIsReplicatedByDefault(true);
 }
 
+USAttributeComponent* USAttributeComponent::GetComponentAttribute(AActor* Actor)
+{
+	USAttributeComponent* AttributeComponent = Actor->GetComponentByClass<USAttributeComponent>();
+
+	return AttributeComponent ? AttributeComponent : nullptr;
+}
+
 // Called when the game starts
 void USAttributeComponent::BeginPlay()
 {
