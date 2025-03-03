@@ -11,6 +11,7 @@
 #include "Engine/LocalPlayer.h"
 #include "SWeapon.h"
 #include "Input/SInputConfigCharacter.h"
+#include "Interface/SInterface.h"
 //Access Macro Multiplayer
 #include "Net/UnrealNetwork.h"
 
@@ -52,6 +53,20 @@ ASCharacter::ASCharacter()
 	HandRAds->SetupAttachment(Mesh1P);
 	
 
+}
+
+void ASCharacter::InteractionSystem()
+{
+
+	if (Interaction)
+	{
+		ISInterface* InteractInterface = Cast<ISInterface>(Interaction);
+
+		if (InteractInterface)
+		{
+			InteractInterface->Execute_Interaction(Interaction);
+		}
+	}
 }
 
 void ASCharacter::CreateWeapon()
@@ -117,6 +132,9 @@ void ASCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 
 		// Looking
 		EnhancedInputComponent->BindAction(InputActions->LookAction, ETriggerEvent::Triggered, this, &ASCharacter::Look);
+
+		// Interaction
+		EnhancedInputComponent->BindAction(InputActions->InteractionAction, ETriggerEvent::Started, this, &ASCharacter::InteractionSystem);
 		
 	}
 	else

@@ -2,6 +2,8 @@
 
 
 #include "SAttributeComponent.h"
+#include "SGameModeWave.h"
+#include "SPlayerState.h"
 #include "Net/UnrealNetwork.h"
 
 // Sets default values for this component's properties
@@ -65,6 +67,14 @@ void USAttributeComponent::HandleTakeAnyDamage(AActor* DamagedActor, float Damag
 	bIsDead = Health <= 0.0f;
 
 	OnHealthChanged.Broadcast(this, Health, Damage, DamageType, InstigatedBy, DamageCauser);
+
+	ASGameModeWave* GM = Cast<ASGameModeWave>(GetWorld()->GetAuthGameMode());
+
+	if (GM)
+	{
+		ASPlayerState* PS = Cast<ASPlayerState>(InstigatedBy->PlayerState);
+		GM->OnActorKilled.Broadcast(nullptr, nullptr, nullptr, PS);
+	}
 
 	if (bIsDead)
 	{

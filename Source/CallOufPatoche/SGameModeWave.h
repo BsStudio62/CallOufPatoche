@@ -6,6 +6,8 @@
 #include "GameFramework/GameModeBase.h"
 #include "SGameModeWave.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(FOnActorKilled, AActor*, VictimActor, AActor*, KillerActor, AController*, KillerController, ASPlayerState*, KillerPlayerState);
+
 class ASSpawnPoint;
 
 UCLASS()
@@ -91,5 +93,8 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void AddRemoveBots(bool Add, AActor* Actor);
+
+	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category = "GameMode")
+	FOnActorKilled OnActorKilled;
 	
 };

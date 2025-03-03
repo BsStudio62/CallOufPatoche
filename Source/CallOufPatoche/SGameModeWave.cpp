@@ -6,6 +6,7 @@
 #include "SSpawnPoint.h"
 #include "SCharacter.h"
 #include "SAttributeComponent.h"
+#include "SPlayerState.h"
 
 ASGameModeWave::ASGameModeWave()
 {
@@ -176,6 +177,13 @@ void ASGameModeWave::PostLogin(APlayerController* NewPlayer)
 	Super::PostLogin(NewPlayer);
 
 	PlayersControllers.Add(NewPlayer);
+
+	ASPlayerState* PS = Cast<ASPlayerState>(NewPlayer->PlayerState);
+
+	if (PS)
+	{
+		PS->AddPoints(500.0f);
+	}
 }
 
 void ASGameModeWave::CheckPlayerAlive()

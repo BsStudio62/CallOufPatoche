@@ -65,6 +65,10 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Enhanced Input")
 	USInputConfigCharacter* InputActions;
 
+	AActor* Interaction;
+
+	void InteractionSystem();
+
 #pragma region Weapon 
 
 	// Weapon Starter //
@@ -119,6 +123,9 @@ public:
 	ASWeapon* GetWeapon() const { return CurrentWeapon; }
 
 #pragma endregion 
+
+	UFUNCTION(BlueprintCallable)
+	void SetInteraction(AActor* ActorValue) { Interaction = ActorValue; }
 
 };
 
