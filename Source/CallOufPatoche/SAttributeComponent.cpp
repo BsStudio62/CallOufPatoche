@@ -72,8 +72,8 @@ void USAttributeComponent::HandleTakeAnyDamage(AActor* DamagedActor, float Damag
 
 	if (GM)
 	{
-		ASPlayerState* PS = Cast<ASPlayerState>(InstigatedBy->PlayerState);
-		GM->OnActorKilled.Broadcast(nullptr, nullptr, nullptr, PS);
+		//ASPlayerState* PS = Cast<ASPlayerState>(InstigatedBy->PlayerState);
+		//GM->OnActorKilled.Broadcast(nullptr, nullptr, nullptr, PS);
 	}
 
 	if (bIsDead)

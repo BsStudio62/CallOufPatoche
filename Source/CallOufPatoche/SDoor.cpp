@@ -2,6 +2,9 @@
 
 
 #include "SDoor.h"
+#include "Components/SphereComponent.h"
+#include "SCharacter.h"
+#include "CallOufPatoche.h"
 
 // Sets default values
 ASDoor::ASDoor()
@@ -10,13 +13,51 @@ ASDoor::ASDoor()
 	PrimaryActorTick.bCanEverTick = false;
 	PrimaryActorTick.bStartWithTickEnabled = false;
 
+	SphereCollision = CreateDefaultSubobject<USphereComponent>(TEXT("SphereCollision"));
+
+	SphereCollision->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	SphereCollision->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
+	SphereCollision->SetCollisionResponseToChannel(COLLISION_PLAYER, ECR_Overlap);
+
+	bReplicates = true;
+
 }
 
 // Called when the game starts or when spawned
 void ASDoor::BeginPlay()
 {
 	Super::BeginPlay();
+
+	if (HasAuthority())
+	{
+		SphereCollision->OnComponentBeginOverlap.AddDynamic(this, &ASDoor::BeginOverlap);
+		SphereCollision->OnComponentEndOverlap.AddDynamic(this, &ASDoor::EndOverlap);
+	}
 	
+}
+
+void ASDoor::BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	//UE_LOG(LogTemp, Error, TEXT("'%s' '%s' Begin "), *GetNameSafe(GetOwner()), *GetNameSafe(this));
+
+	ASCharacter* Player = Cast<ASCharacter>(OtherActor);
+
+	if (Player)
+	{
+		Player->SetInteraction(this);
+	}
+}
+
+void ASDoor::EndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+{
+	//UE_LOG(LogTemp, Error, TEXT("'%s' '%s' End "), *GetNameSafe(GetOwner()), *GetNameSafe(this));
+
+	ASCharacter* Player = Cast<ASCharacter>(OtherActor);
+
+	if (Player)
+	{
+		Player->SetInteraction(nullptr);
+	}
 }
 
 // Called every frame
@@ -26,8 +67,8 @@ void ASDoor::Tick(float DeltaTime)
 
 }
 
-void ASDoor::Interaction_Implementation()
+void ASDoor::Interaction_Implementation(APlayerController* PC)
 {
-	TesteInteraction();
+	Interaction(PC);
 }
 

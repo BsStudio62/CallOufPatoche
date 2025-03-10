@@ -24,6 +24,7 @@ protected:
 
 	int32 Headshots;
 
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite)
 	int32 Points;
 
 public:

@@ -64,7 +64,7 @@ void ASCharacter::InteractionSystem()
 
 		if (InteractInterface)
 		{
-			InteractInterface->Execute_Interaction(Interaction);
+			InteractInterface->Execute_Interaction(Interaction, GetInstigatorController<APlayerController>());
 		}
 	}
 }

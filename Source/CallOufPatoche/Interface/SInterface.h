@@ -24,6 +24,6 @@ class CALLOUFPATOCHE_API ISInterface
 public:
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
-	void Interaction();
+	void Interaction(APlayerController* PC);
 
 };
