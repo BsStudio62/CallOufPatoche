@@ -2,6 +2,7 @@
 
 
 #include "SPlayerState.h"
+#include "SPlayerController.h"
 // Access Macro Multiplayer
 #include "Net/UnrealNetwork.h"
 
@@ -15,6 +16,13 @@ ASPlayerState::ASPlayerState()
 
 	NetUpdateFrequency = 5.0f;
 
+}
+
+void ASPlayerState::OnRep_Points()
+{
+	ASPlayerController* PC = Cast<ASPlayerController>(GetPlayerController());
+
+	PC->OnUpdateHud.Broadcast();
 }
 
 void ASPlayerState::AddPoints(int32 Point)

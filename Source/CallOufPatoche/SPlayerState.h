@@ -24,8 +24,11 @@ protected:
 
 	int32 Headshots;
 
-	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(ReplicatedUsing = OnRep_Points, EditAnywhere, BlueprintReadWrite)
 	int32 Points;
+
+	UFUNCTION()
+	void OnRep_Points();
 
 public:
 
