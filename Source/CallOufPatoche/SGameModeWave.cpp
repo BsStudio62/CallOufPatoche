@@ -24,17 +24,17 @@ void ASGameModeWave::StartPlay()
 {
 	Super::StartPlay();
 
-	UE_LOG(LogTemp, Error, TEXT("'%s' Start Game Mode"), *GetNameSafe(this));
+	//UE_LOG(LogTemp, Error, TEXT("'%s' Start Game Mode"), *GetNameSafe(this));
 
 	if (Init())
 	{
-		UE_LOG(LogTemp, Error, TEXT("'%s' Points de Spawn valid '%d'"), *GetNameSafe(this), SpawnPoints.Num());
+		//UE_LOG(LogTemp, Error, TEXT("'%s' Points de Spawn valid '%d'"), *GetNameSafe(this), SpawnPoints.Num());
 
 		SpawnPointsPossible = SpawnPoints;
 	}
 	else
 	{
-		UE_LOG(LogTemp, Error, TEXT("'%s' Aucun Points de Spawn Valid"), *GetNameSafe(this));
+		//UE_LOG(LogTemp, Error, TEXT("'%s' Aucun Points de Spawn Valid"), *GetNameSafe(this));
 	}
 
 	GetWorldTimerManager().SetTimer(TimerHandle_Launch, this, &ASGameModeWave::StartWave, LaunchDelayStart, false);
@@ -45,18 +45,33 @@ void ASGameModeWave::SpawnBot()
 {
 	int32 Index = 0;
 
+	if (SpawnPointsPossible.IsEmpty())
+	{
+		return;
+	}
+
 	Index = FMath::RandRange(0, SpawnPointsPossible.Num() - 1);
 
-	FTransform SpawnLocation = SpawnPointsPossible[Index]->GetTransform();
-
-	SpawnAI(SpawnLocation);
-
-	BotsSpawn--;
-
-	if (BotsSpawn <= 0)
+	
+	if (SpawnPointsPossible[Index]->GetActivated())
 	{
-		EndWave();
+		FTransform SpawnLocation = SpawnPointsPossible[Index]->GetTransform();
+
+		SpawnAI(SpawnLocation);
+
+		BotsSpawn--;
+
+		if (BotsSpawn <= 0)
+		{
+			EndWave();
+		}
 	}
+	else
+	{
+		SpawnPointsPossible.RemoveAt(Index);
+	}
+
+	
 }
 
 void ASGameModeWave::PrepareNextWave()
@@ -122,7 +137,7 @@ void ASGameModeWave::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 
-	UE_LOG(LogTemp, Error, TEXT("'%s' Tick"), *GetNameSafe(this));
+	//UE_LOG(LogTemp, Error, TEXT("'%s' Tick"), *GetNameSafe(this));
 
 	PlayersLocationSpawnPoint();
 	CheckPlayerAlive();
@@ -133,14 +148,27 @@ void ASGameModeWave::PlayersLocationSpawnPoint()
 {
 	for ( ASSpawnPoint* SpawnPoint : SpawnPoints)
 	{
+		if (!SpawnPoint->GetActivated())
+		{
+			if (SpawnPointsPossible.Contains(SpawnPoint))
+			{
+				SpawnPointsPossible.Remove(SpawnPoint);
+			}
+
+			DrawDebugSphere(GetWorld(), SpawnPoint->GetActorLocation(), 100.0f, 12, FColor::Red, false, 1.0f, 0, 0);
+			continue;
+		}
+
 
 		for (APlayerController* PC : PlayersControllers)
 		{
 			APawn* Pawn = PC->GetPawn();
 
-			float DistanceTo = Pawn->GetDistanceTo(SpawnPoint);
+			float DistanceToPawn = Pawn->GetDistanceTo(SpawnPoint);
 
-			if (DistanceTo < DistanceSpawner)
+			// Spawn point by distance Player
+
+			if (DistanceToPawn < DistanceSpawner)
 			{
 
 				if (!SpawnPointsPossible.Contains(SpawnPoint))
@@ -169,7 +197,7 @@ void ASGameModeWave::PlayersLocationSpawnPoint()
 
 	}
 
-	UE_LOG(LogTemp, Error, TEXT("'%s' SpawnPoints : '%d'"), *GetNameSafe(this), SpawnPointsPossible.Num());
+	//UE_LOG(LogTemp, Error, TEXT("'%s' SpawnPoints : '%d'"), *GetNameSafe(this), SpawnPointsPossible.Num());
 }
 
 void ASGameModeWave::PostLogin(APlayerController* NewPlayer)

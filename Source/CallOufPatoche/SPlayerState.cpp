@@ -22,7 +22,12 @@ void ASPlayerState::OnRep_Points()
 {
 	ASPlayerController* PC = Cast<ASPlayerController>(GetPlayerController());
 
-	PC->OnUpdateHud.Broadcast();
+	if (PC)
+	{
+		PC->OnUpdateHud.Broadcast();
+	}
+
+	
 }
 
 void ASPlayerState::AddPoints(int32 Point)

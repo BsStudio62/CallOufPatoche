@@ -285,7 +285,11 @@ void ASWeapon::PlayAnimation(UAnimMontage* AnimationMontageFPS, UAnimMontage* An
 
 	// Montage Weapon TPS //
 
-	PlayAnimationMontage(FakeWeaponTP->GetWeaponMesh()->GetAnimInstance(), AnimationMontageWeapon, ETypeAnimation::NONE);
+	if (FakeWeaponTP)
+	{
+		PlayAnimationMontage(FakeWeaponTP->GetWeaponMesh()->GetAnimInstance(), AnimationMontageWeapon, ETypeAnimation::NONE);
+	}
+	
 
 }
 

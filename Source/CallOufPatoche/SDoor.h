@@ -8,6 +8,7 @@
 #include "SDoor.generated.h"
 
 class USphereComponent;
+class ASSpawnPoint;
 
 UCLASS()
 class CALLOUFPATOCHE_API ASDoor : public AActor, public ISInterface
@@ -32,6 +33,9 @@ protected:
 
 	UFUNCTION()
 	void EndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	ASSpawnPoint* SpawnPoint;
 
 public:	
 	// Called every frame

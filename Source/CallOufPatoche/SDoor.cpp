@@ -45,6 +45,7 @@ void ASDoor::BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* Othe
 	if (Player)
 	{
 		Player->SetInteraction(this);
+
 	}
 }
 

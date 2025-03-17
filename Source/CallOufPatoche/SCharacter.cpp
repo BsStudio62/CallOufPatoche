@@ -12,6 +12,7 @@
 #include "SWeapon.h"
 #include "Input/SInputConfigCharacter.h"
 #include "Interface/SInterface.h"
+#include "SDoor.h"
 //Access Macro Multiplayer
 #include "Net/UnrealNetwork.h"
 
@@ -57,15 +58,16 @@ ASCharacter::ASCharacter()
 
 void ASCharacter::InteractionSystem()
 {
-
 	if (Interaction)
 	{
+		
 		ISInterface* InteractInterface = Cast<ISInterface>(Interaction);
 
 		if (InteractInterface)
 		{
 			InteractInterface->Execute_Interaction(Interaction, GetInstigatorController<APlayerController>());
 		}
+		
 	}
 }
 

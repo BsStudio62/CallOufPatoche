@@ -65,6 +65,7 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Enhanced Input")
 	USInputConfigCharacter* InputActions;
 
+	UPROPERTY()
 	AActor* Interaction;
 
 	void InteractionSystem();
@@ -124,8 +125,9 @@ public:
 
 #pragma endregion 
 
-	UFUNCTION(BlueprintCallable)
+
 	void SetInteraction(AActor* ActorValue) { Interaction = ActorValue; }
+	
 
 };
 
