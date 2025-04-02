@@ -7,6 +7,7 @@
 #include "SCharacter.h"
 #include "SAttributeComponent.h"
 #include "SPlayerState.h"
+#include "SGameStateWave.h"
 
 ASGameModeWave::ASGameModeWave()
 {
@@ -122,6 +123,10 @@ bool ASGameModeWave::Init()
 void ASGameModeWave::StartWave()
 {
 	WaveCount++;
+
+	ASGameStateWave* GameStateWave = GetGameState<ASGameStateWave>();
+
+	if (GameStateWave) GameStateWave->IncrementeWave();
 
 	BotsSpawn = WaveCount * 2;
 

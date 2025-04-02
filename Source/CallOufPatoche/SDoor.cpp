@@ -5,6 +5,8 @@
 #include "Components/SphereComponent.h"
 #include "SCharacter.h"
 #include "CallOufPatoche.h"
+#include "Widget/SHud.h"
+#include "SPlayerController.h"
 
 // Sets default values
 ASDoor::ASDoor()
@@ -45,7 +47,7 @@ void ASDoor::BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* Othe
 	if (Player)
 	{
 		Player->SetInteraction(this);
-
+		ASPlayerController::GetPlayerController(Player)->Client_UpdateHudEnum(EUpdateHud::Interaction, true, this);
 	}
 }
 
@@ -58,6 +60,7 @@ void ASDoor::EndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherA
 	if (Player)
 	{
 		Player->SetInteraction(nullptr);
+		ASPlayerController::GetPlayerController(Player)->Client_UpdateHudEnum(EUpdateHud::Interaction, false, nullptr);
 	}
 }
 

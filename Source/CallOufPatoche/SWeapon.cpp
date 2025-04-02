@@ -11,6 +11,8 @@
 #include "CallOufPatoche.h"
 #include "PhysicalMaterials/PhysicalMaterial.h"
 #include "Kismet/GameplayStatics.h"
+#include "SPlayerController.h"
+#include "Widget/SHud.h"
 // Access Macro Multiplayer
 #include "Net/UnrealNetwork.h"
 
@@ -99,7 +101,7 @@ void ASWeapon::Fire()
 
 	ASCharacter* Char = Cast<ASCharacter>(MyOwner);
 
-	APlayerController* PC = MyOwner->GetInstigatorController<APlayerController>();
+	ASPlayerController* PC = MyOwner->GetInstigatorController<ASPlayerController>();
 
 	if (MyOwner)
 	{
@@ -200,6 +202,8 @@ void ASWeapon::Fire()
 		LastFireTime = GetWorld()->TimeSeconds;
 
 		Munition--;
+
+		PC->Client_UpdateHudEnum(EUpdateHud::Munition, true, nullptr);
 
 		OnFire.Broadcast();
 
@@ -366,6 +370,11 @@ void ASWeapon::RefillMunitionMax(AActor* OwnerChar)
 			Weapon->Munition = Weapon->MagazineCapacity;
 			Weapon->MunitionMagazine = Weapon->MunitionMagazineMax;
 			Weapon->OnFire.Broadcast();
+
+			ASPlayerController* PC = Pawn->GetInstigatorController<ASPlayerController>();
+
+			if (PC) PC->Client_UpdateHudEnum(EUpdateHud::Munition, true, nullptr);
+
 		}
 		
 	}
@@ -432,7 +441,13 @@ void ASWeapon::MontageEndedReload(UAnimMontage* Montage, bool bInterrupted)
 	{
 
 		Munition += CalculateMunition();
+
 		OnFire.Broadcast();
+
+		ASPlayerController* PC = GetOwner()->GetInstigatorController<ASPlayerController>();
+
+		if (PC) PC->Client_UpdateHudEnum(EUpdateHud::Munition, true, nullptr);
+
 		bReloading = false;		
 
 		// Unbound Dynamic

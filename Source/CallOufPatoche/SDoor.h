@@ -37,6 +37,12 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	ASSpawnPoint* SpawnPoint;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	int32 Cost;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	FText TextInteraction;
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;

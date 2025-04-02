@@ -5,6 +5,7 @@
 #include "Blueprint/UserWidget.h"
 // Input
 #include "EnhancedInputSubsystems.h"
+#include "Widget/SHud.h"
 
 ASPlayerController::ASPlayerController()
 {
@@ -38,6 +39,21 @@ void ASPlayerController::CreateWidgetHud()
 	}
 	
 	
+}
+
+ASPlayerController* ASPlayerController::GetPlayerController(AActor* Owner)
+{
+	return Owner->GetInstigatorController<ASPlayerController>();
+}
+
+void ASPlayerController::Client_UpdateHudEnum_Implementation(EUpdateHud UpdateHud, bool bActive, AActor* Interactable)
+{
+	USHud* HudLocal = Cast<USHud>(Hud);
+
+	if (HudLocal)
+	{
+		HudLocal->UpdateHud(UpdateHud, bActive, Interactable);
+	}
 }
 
 void ASPlayerController::Client_UpdateHud_Implementation()

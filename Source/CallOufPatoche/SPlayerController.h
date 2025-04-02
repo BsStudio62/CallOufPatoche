@@ -9,6 +9,8 @@
 class UInputMappingContext;
 class UUserWidget;
 
+enum class EUpdateHud : uint8;
+
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnUpdateHud);
 
 UCLASS()
@@ -41,5 +43,12 @@ public:
 
 	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category = "Events")
 	FOnUpdateHud OnUpdateHud;
+
+	UUserWidget* GetHud() const { return Hud; }
+
+	UFUNCTION(Client, reliable)
+	void Client_UpdateHudEnum(EUpdateHud UpdateHud, bool bActive, AActor* Interactable);
+
+	static ASPlayerController* GetPlayerController(AActor* Owner) ;
 	
 };
