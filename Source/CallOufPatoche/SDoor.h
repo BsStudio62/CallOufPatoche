@@ -3,22 +3,16 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/Actor.h"
-#include "Interface/SInterface.h"
+#include "SInteractable.h"
 #include "SDoor.generated.h"
 
-class USphereComponent;
 class ASSpawnPoint;
 
 UCLASS()
-class CALLOUFPATOCHE_API ASDoor : public AActor, public ISInterface
+class CALLOUFPATOCHE_API ASDoor : public ASInteractable
 {
 	GENERATED_BODY()
 
-protected:
-
-	UPROPERTY(EditAnywhere)
-	USphereComponent* SphereCollision;
 	
 public:	
 	// Sets default values for this actor's properties
@@ -28,30 +22,14 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	UFUNCTION()
-	void BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
-
-	UFUNCTION()
-	void EndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
-
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	ASSpawnPoint* SpawnPoint;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	int32 Cost;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	FText TextInteraction;
 
 	UPROPERTY(EditDefaultsOnly)
 	bool bActivatedDoor;
 
-public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
+public:
 
 	virtual void Interaction_Implementation(APlayerController* PC) override;
 
-	UFUNCTION(BlueprintImplementableEvent)
-	void Interaction(APlayerController* PC);
 };

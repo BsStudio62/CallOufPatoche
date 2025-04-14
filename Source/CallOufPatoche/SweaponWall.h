@@ -3,14 +3,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/Actor.h"
-#include "Interface/SInterface.h"
+#include "SInteractable.h"
 #include "SweaponWall.generated.h"
 
-class USphereComponent;
-
 UCLASS()
-class CALLOUFPATOCHE_API ASweaponWall : public AActor, public ISInterface
+class CALLOUFPATOCHE_API ASweaponWall : public ASInteractable
 {
 	GENERATED_BODY()
 	
@@ -22,27 +19,10 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	UStaticMeshComponent* Weapon;
 
-	UPROPERTY(EditAnywhere)
-	USphereComponent* SphereCollision;
-
-	UFUNCTION()
-	void BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
-
-	UFUNCTION()
-	void EndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	int32 Cost;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	FText TextInteraction;
-
-public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
+public:
 
 	virtual void Interaction_Implementation(APlayerController* PC) override;
 

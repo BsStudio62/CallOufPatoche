@@ -74,7 +74,7 @@ protected:
 	ASWeapon* FakeWeaponTP;
 
 	// Socket Weapon Attach
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	FName Socket;
 
 	UPROPERTY(EditDefaultsOnly)
@@ -228,6 +228,7 @@ public:
 
 	void StopAim();
 
+	UFUNCTION(BlueprintCallable)
 	void SetupInputSystem();
 
 	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category = "Events")

@@ -77,11 +77,11 @@ protected:
 	TSubclassOf<ASWeapon> WeaponStarterClass;
 
 	// Weapon //
-	UPROPERTY(Replicated, BlueprintReadOnly)
+	UPROPERTY(Replicated, BlueprintReadWrite)
 	ASWeapon* CurrentWeapon;
 
 	// Fake Weapon //
-	UPROPERTY(Replicated, BlueprintReadOnly)
+	UPROPERTY(Replicated, BlueprintReadWrite)
 	ASWeapon* FakeWeapon;
 
 	void CreateWeapon();
@@ -114,6 +114,7 @@ public:
 #pragma region // Get
 
 	/** Returns Mesh1P subobject **/
+	UFUNCTION(BlueprintPure)
 	USkeletalMeshComponent* GetMesh1P() const { return Mesh1P; }
 
 	/** Returns FirstPersonCameraComponent subobject **/
