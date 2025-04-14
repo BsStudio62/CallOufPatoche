@@ -5,28 +5,28 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "Interface/SInterface.h"
-#include "SDoor.generated.h"
+#include "SweaponWall.generated.h"
 
 class USphereComponent;
-class ASSpawnPoint;
 
 UCLASS()
-class CALLOUFPATOCHE_API ASDoor : public AActor, public ISInterface
+class CALLOUFPATOCHE_API ASweaponWall : public AActor, public ISInterface
 {
 	GENERATED_BODY()
-
-protected:
-
-	UPROPERTY(EditAnywhere)
-	USphereComponent* SphereCollision;
 	
 public:	
 	// Sets default values for this actor's properties
-	ASDoor();
+	ASweaponWall();
 
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+
+	UPROPERTY(EditAnywhere)
+	UStaticMeshComponent* Weapon;
+
+	UPROPERTY(EditAnywhere)
+	USphereComponent* SphereCollision;
 
 	UFUNCTION()
 	void BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
@@ -34,17 +34,11 @@ protected:
 	UFUNCTION()
 	void EndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	ASSpawnPoint* SpawnPoint;
-
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	int32 Cost;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	FText TextInteraction;
-
-	UPROPERTY(EditDefaultsOnly)
-	bool bActivatedDoor;
 
 public:	
 	// Called every frame
@@ -52,6 +46,4 @@ public:
 
 	virtual void Interaction_Implementation(APlayerController* PC) override;
 
-	UFUNCTION(BlueprintImplementableEvent)
-	void Interaction(APlayerController* PC);
 };

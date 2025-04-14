@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "SDoor.h"
+#include "SweaponWall.h"
 #include "Components/SphereComponent.h"
 #include "SCharacter.h"
 #include "CallOufPatoche.h"
@@ -9,11 +9,13 @@
 #include "SPlayerController.h"
 
 // Sets default values
-ASDoor::ASDoor()
+ASweaponWall::ASweaponWall()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = false;
 	PrimaryActorTick.bStartWithTickEnabled = false;
+
+	RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("RootComponent"));
 
 	SphereCollision = CreateDefaultSubobject<USphereComponent>(TEXT("SphereCollision"));
 
@@ -21,31 +23,29 @@ ASDoor::ASDoor()
 	SphereCollision->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
 	SphereCollision->SetCollisionResponseToChannel(COLLISION_PLAYER, ECR_Overlap);
 
+	SphereCollision->SetupAttachment(RootComponent);
+
+	Weapon = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Weapon"));
+	Weapon->SetupAttachment(SphereCollision);
+
 	bReplicates = true;
-
-	bActivatedDoor = false;
-
 }
 
 // Called when the game starts or when spawned
-void ASDoor::BeginPlay()
+void ASweaponWall::BeginPlay()
 {
 	Super::BeginPlay();
 
-	SphereCollision->SetGenerateOverlapEvents(bActivatedDoor);
-
 	if (HasAuthority())
 	{
-		SphereCollision->OnComponentBeginOverlap.AddDynamic(this, &ASDoor::BeginOverlap);
-		SphereCollision->OnComponentEndOverlap.AddDynamic(this, &ASDoor::EndOverlap);
+		SphereCollision->OnComponentBeginOverlap.AddDynamic(this, &ASweaponWall::BeginOverlap);
+		SphereCollision->OnComponentEndOverlap.AddDynamic(this, &ASweaponWall::EndOverlap);
 	}
 	
 }
 
-void ASDoor::BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+void ASweaponWall::BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	//UE_LOG(LogTemp, Error, TEXT("'%s' '%s' Begin "), *GetNameSafe(GetOwner()), *GetNameSafe(this));
-
 	ASCharacter* Player = Cast<ASCharacter>(OtherActor);
 
 	if (Player)
@@ -53,11 +53,11 @@ void ASDoor::BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* Othe
 		Player->SetInteraction(this);
 		ASPlayerController::GetPlayerController(Player)->Client_UpdateHudEnum(EUpdateHud::Interaction, true, this);
 	}
+
 }
 
-void ASDoor::EndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+void ASweaponWall::EndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
-	//UE_LOG(LogTemp, Error, TEXT("'%s' '%s' End "), *GetNameSafe(GetOwner()), *GetNameSafe(this));
 
 	ASCharacter* Player = Cast<ASCharacter>(OtherActor);
 
@@ -69,14 +69,13 @@ void ASDoor::EndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherA
 }
 
 // Called every frame
-void ASDoor::Tick(float DeltaTime)
+void ASweaponWall::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
 }
 
-void ASDoor::Interaction_Implementation(APlayerController* PC)
+void ASweaponWall::Interaction_Implementation(APlayerController* PC)
 {
-	Interaction(PC);
 }
 
