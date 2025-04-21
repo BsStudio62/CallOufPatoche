@@ -385,30 +385,38 @@ void ASWeapon::RefillMunitionMax(AActor* OwnerChar)
 void ASWeapon::SetupInputSystem()
 {
 	// Set up action bindings
-
-	if (APlayerController* PlayerController = Cast<APlayerController>(GetOwner()->GetInstigatorController()))
+	if (GetOwner())
 	{
-		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
+
+		if (APlayerController* PlayerController = Cast<APlayerController>(GetOwner()->GetInstigatorController()))
 		{
-			// Set the priority of the mapping to 1, so that it overrides the Jump action with the Fire action when using touch input
-			Subsystem->AddMappingContext(WeaponMappingContext, 1);
-		}
+			if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
+			{
+				// Set the priority of the mapping to 1, so that it overrides the Jump action with the Fire action when using touch input
+				Subsystem->AddMappingContext(WeaponMappingContext, 1);
+			}
 
-		if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerController->InputComponent))
-		{
-			// Fire
-			EnhancedInputComponent->BindAction(InputActions->FireAction, ETriggerEvent::Started, this, &ASWeapon::StartFire);
-			EnhancedInputComponent->BindAction(InputActions->FireAction, ETriggerEvent::Completed, this, &ASWeapon::StopFire);
+			if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerController->InputComponent))
+			{
+				// Fire
+				EnhancedInputComponent->BindAction(InputActions->FireAction, ETriggerEvent::Started, this, &ASWeapon::StartFire);
+				EnhancedInputComponent->BindAction(InputActions->FireAction, ETriggerEvent::Completed, this, &ASWeapon::StopFire);
 
-			// Aim
-			EnhancedInputComponent->BindAction(InputActions->AimAction, ETriggerEvent::Started, this, &ASWeapon::StartAim);
-			EnhancedInputComponent->BindAction(InputActions->AimAction, ETriggerEvent::Completed, this, &ASWeapon::StopAim);
+				// Aim
+				EnhancedInputComponent->BindAction(InputActions->AimAction, ETriggerEvent::Started, this, &ASWeapon::StartAim);
+				EnhancedInputComponent->BindAction(InputActions->AimAction, ETriggerEvent::Completed, this, &ASWeapon::StopAim);
 
-			//Reload 
-			EnhancedInputComponent->BindAction(InputActions->ReloadAction, ETriggerEvent::Started, this, &ASWeapon::StartReload);
+				//Reload 
+				EnhancedInputComponent->BindAction(InputActions->ReloadAction, ETriggerEvent::Started, this, &ASWeapon::StartReload);
 
+			}
 		}
 	}
+	else
+	{
+		UE_LOG(LogTemplateWeapon, Error, TEXT("'%s' Owner not valid"), *GetNameSafe(this));
+	}
+
 
 }
 

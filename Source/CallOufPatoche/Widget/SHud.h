@@ -14,6 +14,7 @@ enum class EUpdateHud : uint8
 	Score	    UMETA(DisplayName = "Score"),
 	Munition	    UMETA(DisplayName = "Munition"),
 	Interaction		UMETA(DisplayName = "Interaction"),
+	Weapon		UMETA(DisplayName = "Weapon"),
 };
 
 UCLASS()

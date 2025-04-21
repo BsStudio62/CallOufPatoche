@@ -48,9 +48,7 @@ ASPlayerController* ASPlayerController::GetPlayerController(AActor* Owner)
 
 void ASPlayerController::Client_UpdateHudEnum_Implementation(EUpdateHud UpdateHud, bool bActive, AActor* Interactable)
 {
-	USHud* HudLocal = Cast<USHud>(Hud);
-
-	if (HudLocal)
+	if (USHud* HudLocal = Cast<USHud>(Hud))
 	{
 		HudLocal->UpdateHud(UpdateHud, bActive, Interactable);
 	}

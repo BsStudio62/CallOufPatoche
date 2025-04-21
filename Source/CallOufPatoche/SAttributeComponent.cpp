@@ -17,6 +17,11 @@ USAttributeComponent::USAttributeComponent()
 	DefaultHealth = 100;
 	bIsDead = false;
 
+	bActivateRegenHealth = false;
+
+	RegenHealth = 1.0f;
+	DelayRegen = 1.0f;
+
 	SetIsReplicatedByDefault(true);
 }
 
@@ -76,11 +81,34 @@ void USAttributeComponent::HandleTakeAnyDamage(AActor* DamagedActor, float Damag
 		//GM->OnActorKilled.Broadcast(nullptr, nullptr, nullptr, PS);
 	}
 
+	if (!bIsDead)
+	{
+		LaunchTimerRegen();
+	}
+
 	if (bIsDead)
 	{
 		Dead();
 	}
 
+}
+
+void USAttributeComponent::LaunchTimerRegen()
+{
+	GetWorld()->GetTimerManager().SetTimer(RegenTimerHandle, this, &USAttributeComponent::RegenerationHealth, DelayRegen, true);
+}
+
+void USAttributeComponent::RegenerationHealth()
+{
+
+	Health = FMath::Clamp(Health + RegenHealth, 0.0f, DefaultHealth);
+
+	OnHealthChanged.Broadcast(this, Health, 0.0f, nullptr, nullptr, nullptr);
+
+	if (Health == DefaultHealth)
+	{
+		GetWorld()->GetTimerManager().ClearTimer(RegenTimerHandle);
+	}
 }
 
 void USAttributeComponent::ResetHealth()

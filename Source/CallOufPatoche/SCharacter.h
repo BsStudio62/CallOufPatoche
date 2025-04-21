@@ -91,6 +91,7 @@ protected:
 	virtual void BeginPlay();
 
 protected:
+
 	/** Called for movement input */
 	void Move(const FInputActionValue& Value);
 
@@ -99,6 +100,7 @@ protected:
 
 	void StartDelayed();
 
+	UFUNCTION(BlueprintCallable)
 	void SetupAnimationLayer();
 
 	void InitializationIkSystem();

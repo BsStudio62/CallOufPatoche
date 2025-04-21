@@ -46,7 +46,7 @@ public:
 
 	UUserWidget* GetHud() const { return Hud; }
 
-	UFUNCTION(Client, reliable)
+	UFUNCTION(Client, reliable,BlueprintCallable)
 	void Client_UpdateHudEnum(EUpdateHud UpdateHud, bool bActive, AActor* Interactable);
 
 	static ASPlayerController* GetPlayerController(AActor* Owner) ;

@@ -39,6 +39,23 @@ protected:
 	UFUNCTION()
 	void HandleTakeAnyDamage(AActor* DamagedActor, float Damage, const class UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser);
 
+#pragma region // Regen
+
+	UPROPERTY(EditDefaultsOnly)
+	bool bActivateRegenHealth;
+
+	void LaunchTimerRegen();
+
+	void RegenerationHealth();
+
+	FTimerHandle RegenTimerHandle;
+
+	float DelayRegen;
+
+	float RegenHealth;
+
+#pragma endregion
+
 public:	
 
 	UPROPERTY(BlueprintAssignable, BlueprintCallable, Category = "Events")
