@@ -27,10 +27,15 @@ protected:
 	UPROPERTY(EditDefaultsOnly)
 	UInputMappingContext* DefaultMappingContext;
 
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditDefaultsOnly, Category = "Widgets")
 	TSubclassOf<UUserWidget> HudClass;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Widgets")
+	TSubclassOf<UUserWidget> ScoreClass;
+	
 	UUserWidget* Hud;
+
+	UUserWidget* Score;
 
 	virtual void BeginPlay() override;
 
@@ -49,6 +54,8 @@ public:
 	UFUNCTION(Client, reliable,BlueprintCallable)
 	void Client_UpdateHudEnum(EUpdateHud UpdateHud, bool bActive, AActor* Interactable);
 
-	static ASPlayerController* GetPlayerController(AActor* Owner) ;
+	static ASPlayerController* GetPlayerController(const AActor* Owner) ;
+
+	void ManageScreenScoring(const bool bShow);
 	
 };

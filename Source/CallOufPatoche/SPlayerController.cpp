@@ -41,9 +41,31 @@ void ASPlayerController::CreateWidgetHud()
 	
 }
 
-ASPlayerController* ASPlayerController::GetPlayerController(AActor* Owner)
+ASPlayerController* ASPlayerController::GetPlayerController(const AActor* Owner)
 {
 	return Owner->GetInstigatorController<ASPlayerController>();
+}
+
+void ASPlayerController::ManageScreenScoring(const bool bShow)
+{
+	if (bShow)
+	{
+		if (IsLocalPlayerController())
+		{
+			Score = CreateWidget<UUserWidget>(this, ScoreClass);
+
+			if (Score)
+			{
+				Score->AddToViewport();
+			}
+		}
+	}
+	else
+	{
+		Score->RemoveFromParent();
+		Score = nullptr;
+	}
+	
 }
 
 void ASPlayerController::Client_UpdateHudEnum_Implementation(EUpdateHud UpdateHud, bool bActive, AActor* Interactable)

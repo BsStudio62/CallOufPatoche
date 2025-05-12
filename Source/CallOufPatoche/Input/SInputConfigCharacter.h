@@ -29,4 +29,11 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	UInputAction* InteractionAction;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	UInputAction* ScoreAction;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	UInputAction* SwitchWeaponAction;
+
+	
 };

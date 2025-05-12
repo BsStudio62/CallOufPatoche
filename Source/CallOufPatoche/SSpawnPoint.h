@@ -29,6 +29,6 @@ public:
 	bool GetActivated() const { return bActivated; }
 
 	UFUNCTION(BlueprintCallable)
-	void SetActivated(bool bActivatedValue) { bActivated = bActivatedValue; }
+	void SetActivated(bool bActivatedValue ) { bActivated = bActivatedValue; }
 
 };

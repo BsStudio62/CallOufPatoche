@@ -12,7 +12,7 @@
 #include "SWeapon.h"
 #include "Input/SInputConfigCharacter.h"
 #include "Interface/SInterface.h"
-#include "SDoor.h"
+#include "SPlayerController.h"
 //Access Macro Multiplayer
 #include "Net/UnrealNetwork.h"
 
@@ -60,15 +60,32 @@ void ASCharacter::InteractionSystem()
 {
 	if (Interaction)
 	{
-		
-		ISInterface* InteractInterface = Cast<ISInterface>(Interaction);
 
-		if (InteractInterface)
+		if (const ISInterface* InteractInterface = Cast<ISInterface>(Interaction))
 		{
 			InteractInterface->Execute_Interaction(Interaction, GetInstigatorController<APlayerController>());
 		}
 		
 	}
+}
+
+void ASCharacter::NextWeapon()
+{
+}
+
+void ASCharacter::PreviousWeapon()
+{
+}
+
+void ASCharacter::ShowScreenScore()
+{
+	PC->ManageScreenScoring(true);
+	
+}
+
+void ASCharacter::HideScreenScore()
+{
+	PC->ManageScreenScoring(false);
 }
 
 void ASCharacter::CreateWeapon()
@@ -108,6 +125,8 @@ void ASCharacter::BeginPlay()
 	// Add Input Mapping Context
 	if (APlayerController* PlayerController = Cast<APlayerController>(Controller))
 	{
+		PC = Cast<ASPlayerController>(PlayerController);
+		
 		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
 		{
 			Subsystem->AddMappingContext(CharacterMappingContext, 0);
@@ -120,6 +139,7 @@ void ASCharacter::BeginPlay()
 
 //////////////////////////////////////////////////////////////////////////// Input
 
+// ReSharper disable once CppParameterNamesMismatch
 void ASCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	// Set up action bindings
@@ -137,7 +157,16 @@ void ASCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 
 		// Interaction
 		EnhancedInputComponent->BindAction(InputActions->InteractionAction, ETriggerEvent::Started, this, &ASCharacter::InteractionSystem);
-		
+
+		// Switch Weapon
+		// Next Weapon
+		EnhancedInputComponent->BindAction(InputActions->SwitchWeaponAction, ETriggerEvent::Started, this, &ASCharacter::NextWeapon);
+		// Previous Weapon
+		EnhancedInputComponent->BindAction(InputActions->SwitchWeaponAction, ETriggerEvent::Started, this, &ASCharacter::PreviousWeapon);
+
+		// Widget Score
+		EnhancedInputComponent->BindAction(InputActions->ScoreAction, ETriggerEvent::Started, this, &ASCharacter::ShowScreenScore);
+		EnhancedInputComponent->BindAction(InputActions->ScoreAction, ETriggerEvent::Completed, this, &ASCharacter::HideScreenScore);
 	}
 	else
 	{
@@ -145,7 +174,7 @@ void ASCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 	}
 }
 
-UAnimInstance* ASCharacter::GetAnimationInstance(EAnimationInstance AnimationInstance) const
+UAnimInstance* ASCharacter::GetAnimationInstance(const EAnimationInstance AnimationInstance) const
 {
 	UAnimInstance* Animation = nullptr;
 
@@ -170,7 +199,7 @@ UAnimInstance* ASCharacter::GetAnimationInstance(EAnimationInstance AnimationIns
 void ASCharacter::Move(const FInputActionValue& Value)
 {
 	// input is a Vector2D
-	FVector2D MovementVector = Value.Get<FVector2D>();
+	const FVector2D MovementVector = Value.Get<FVector2D>();
 
 	if (Controller != nullptr)
 	{
@@ -183,7 +212,7 @@ void ASCharacter::Move(const FInputActionValue& Value)
 void ASCharacter::Look(const FInputActionValue& Value)
 {
 	// input is a Vector2D
-	FVector2D LookAxisVector = Value.Get<FVector2D>();
+	const FVector2D LookAxisVector = Value.Get<FVector2D>();
 
 	if (Controller != nullptr)
 	{

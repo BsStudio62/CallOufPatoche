@@ -31,13 +31,13 @@ protected:
 	float Health;
 
 	UFUNCTION()
-	void OnRep_Health(float OldHealth);
+	void OnRep_Health(const float OldHealth);
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HealthComponent")
 	float DefaultHealth;
 
 	UFUNCTION()
-	void HandleTakeAnyDamage(AActor* DamagedActor, float Damage, const class UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser);
+	void HandleTakeAnyDamage(AActor* DamagedActor,const float Damage, const class UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser);
 
 #pragma region // Regen
 
@@ -73,10 +73,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void Heal(float HealAmount);
 
-	// Called every frame
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
-
 	// Return player dead or not
-	bool GetPlayerIsAlive() { return bIsDead; }
+	bool GetPlayerIsAlive() const { return bIsDead; }
 
 };

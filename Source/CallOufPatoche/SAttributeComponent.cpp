@@ -39,9 +39,8 @@ void USAttributeComponent::BeginPlay()
 
 	if (GetOwnerRole() == ROLE_Authority)
 	{
-		AActor* MyOwner = GetOwner();
-
-		if (MyOwner)
+		
+		if (AActor* MyOwner = GetOwner())
 		{
 			MyOwner->OnTakeAnyDamage.AddDynamic(this, &USAttributeComponent::HandleTakeAnyDamage);
 		}
@@ -50,14 +49,14 @@ void USAttributeComponent::BeginPlay()
 	Health = DefaultHealth;
 }
 
-void USAttributeComponent::OnRep_Health(float OldHealth)
+void USAttributeComponent::OnRep_Health(const float OldHealth)
 {
-	float Damage = Health - OldHealth;
+	const float Damage = Health - OldHealth;
 
 	OnHealthChanged.Broadcast(this, Health, Damage, nullptr, nullptr, nullptr);
 }
 
-void USAttributeComponent::HandleTakeAnyDamage(AActor* DamagedActor, float Damage, const UDamageType* DamageType, AController* InstigatedBy, AActor* DamageCauser)
+void USAttributeComponent::HandleTakeAnyDamage(AActor* DamagedActor,const float Damage, const UDamageType* DamageType, AController* InstigatedBy, AActor* DamageCauser)
 {
 	if (Damage <= 0.0f || bIsDead)
 	{
@@ -72,10 +71,8 @@ void USAttributeComponent::HandleTakeAnyDamage(AActor* DamagedActor, float Damag
 	bIsDead = Health <= 0.0f;
 
 	OnHealthChanged.Broadcast(this, Health, Damage, DamageType, InstigatedBy, DamageCauser);
-
-	ASGameModeWave* GM = Cast<ASGameModeWave>(GetWorld()->GetAuthGameMode());
-
-	if (GM)
+	
+	if (ASGameModeWave* GM = Cast<ASGameModeWave>(GetWorld()->GetAuthGameMode()))
 	{
 		//ASPlayerState* PS = Cast<ASPlayerState>(InstigatedBy->PlayerState);
 		//GM->OnActorKilled.Broadcast(nullptr, nullptr, nullptr, PS);
@@ -119,7 +116,7 @@ void USAttributeComponent::ResetHealth()
 	UE_LOG(LogTemp, Log, TEXT("Health Changed: %s"), *FString::SanitizeFloat(Health));
 }
 
-void USAttributeComponent::Heal(float HealAmount)
+void USAttributeComponent::Heal(const float HealAmount)
 {
 	if (HealAmount <= 0.0f || Health <= 0.0f)
 	{
@@ -132,14 +129,6 @@ void USAttributeComponent::Heal(float HealAmount)
 
 	OnHealthChanged.Broadcast(this, Health, -HealAmount, nullptr, nullptr, nullptr);
 
-}
-
-// Called every frame
-void USAttributeComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
-{
-	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
-	// ...
 }
 
 void USAttributeComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const

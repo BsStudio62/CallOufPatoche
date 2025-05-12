@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "SPlayerController.h"
 #include "GameFramework/Character.h"
 #include "Logging/LogMacros.h"
 #include "SCharacter.generated.h"
@@ -68,7 +69,22 @@ protected:
 	UPROPERTY()
 	AActor* Interaction;
 
+	UPROPERTY()
+	ASPlayerController* PC;
+	
+#pragma region Input Function
+	
 	void InteractionSystem();
+
+	void NextWeapon();
+
+	void PreviousWeapon();
+
+	void ShowScreenScore();
+
+	void HideScreenScore();
+	
+#pragma endregion
 
 #pragma region Weapon 
 
