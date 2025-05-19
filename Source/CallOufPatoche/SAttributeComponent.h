@@ -6,6 +6,12 @@
 #include "Components/ActorComponent.h"
 #include "SAttributeComponent.generated.h"
 
+UENUM(BlueprintType)
+enum class EControllerPossType : uint8 {
+	Player = 0 UMETA(DisplayName = "Player"),
+	AI = 1  UMETA(DisplayName = "AI"),
+};
+
 // OnHealthChanged event
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_SixParams(FOnHealthChangedSignature, USAttributeComponent*, OwningHealthComp, float, Health, float, HealthDelta, const class UDamageType*, DamageType, class AController*, InstigatedBy, AActor*, DamageCauser);
 
@@ -24,6 +30,9 @@ protected:
 
 	// Called when the game starts
 	virtual void BeginPlay() override;
+
+	UPROPERTY(EditDefaultsOnly, Category = Attribute)
+	EControllerPossType ControllerType;
 
 	bool bIsDead;
 
@@ -62,7 +71,7 @@ public:
 	FOnHealthChangedSignature OnHealthChanged;
 
 	UFUNCTION(BlueprintImplementableEvent)
-	void Dead();
+	void Dead(EControllerPossType ControllerPossType);
 
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
 	void Revive();

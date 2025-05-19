@@ -72,11 +72,11 @@ void USAttributeComponent::HandleTakeAnyDamage(AActor* DamagedActor,const float 
 
 	OnHealthChanged.Broadcast(this, Health, Damage, DamageType, InstigatedBy, DamageCauser);
 	
-	if (ASGameModeWave* GM = Cast<ASGameModeWave>(GetWorld()->GetAuthGameMode()))
+	/*if (ASGameModeWave* GM = Cast<ASGameModeWave>(GetWorld()->GetAuthGameMode()))
 	{
 		//ASPlayerState* PS = Cast<ASPlayerState>(InstigatedBy->PlayerState);
 		//GM->OnActorKilled.Broadcast(nullptr, nullptr, nullptr, PS);
-	}
+	}*/
 
 	if (!bIsDead)
 	{
@@ -85,7 +85,18 @@ void USAttributeComponent::HandleTakeAnyDamage(AActor* DamagedActor,const float 
 
 	if (bIsDead)
 	{
-		Dead();
+		GetWorld()->GetTimerManager().ClearTimer(RegenTimerHandle);
+		
+		switch (ControllerType)
+		{
+			default: break;
+
+			case EControllerPossType::Player:
+			break;
+		}
+		
+		// Access BP
+		Dead(ControllerType);
 	}
 
 }

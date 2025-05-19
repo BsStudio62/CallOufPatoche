@@ -53,7 +53,7 @@ ASCharacter::ASCharacter()
 	HandRAds = CreateDefaultSubobject<USceneComponent>(TEXT("HandRAds"));
 	HandRAds->SetupAttachment(Mesh1P);
 	
-
+	SelectionWeapon = 0;
 }
 
 void ASCharacter::InteractionSystem()
@@ -71,10 +71,20 @@ void ASCharacter::InteractionSystem()
 
 void ASCharacter::NextWeapon()
 {
+	if (Weapons.Num() == 1) return ;
+
+	SwitchWeapon(true);
+
+	//UE_LOG(LogTemplateCharacter, Error, TEXT("'%s' NextWeapon"), *GetNameSafe(this));
 }
 
 void ASCharacter::PreviousWeapon()
 {
+	if (Weapons.Num() == 1) return ;
+
+	SwitchWeapon(false);
+
+	//UE_LOG(LogTemplateCharacter, Error, TEXT("'%s' PreviousWeapon"), *GetNameSafe(this));
 }
 
 void ASCharacter::ShowScreenScore()
@@ -88,33 +98,63 @@ void ASCharacter::HideScreenScore()
 	PC->ManageScreenScoring(false);
 }
 
-void ASCharacter::CreateWeapon()
+void ASCharacter::CreateWeapon(TSubclassOf<ASWeapon> WeaponClass)
 {
 
 	// Create Weapon server
 	if (HasAuthority())
 	{
-		if (!WeaponStarterClass) return;
+		if (!WeaponClass) return;
 
 		FActorSpawnParameters Params;
 		Params.Owner = this;
 
 		// SpawnWeapon
-		CurrentWeapon = GetWorld()->SpawnActor<ASWeapon>(WeaponStarterClass, FVector::ZeroVector, FRotator::ZeroRotator, Params);
+		CurrentWeapon = GetWorld()->SpawnActor<ASWeapon>(WeaponClass, FVector::ZeroVector, FRotator::ZeroRotator, Params);
 		// Attach Weapon
 		CurrentWeapon->AttachToComponent(Mesh1P, FAttachmentTransformRules::SnapToTargetNotIncludingScale, CurrentWeapon->GetSocket());
 
 		// Spawn Fake Weapon
-		FakeWeapon = GetWorld()->SpawnActor<ASWeapon>(WeaponStarterClass, FVector::ZeroVector, FRotator::ZeroRotator, Params);
+		FakeWeapon = GetWorld()->SpawnActor<ASWeapon>(WeaponClass, FVector::ZeroVector, FRotator::ZeroRotator, Params);
 		// Attach Fake Weapon
 		FakeWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, FakeWeapon->GetSocket());
 		FakeWeapon->HideFakeWeapon(true);
+
+		FWeapon Weapon;
+
+		Weapon.WeaponClass = WeaponClass;
+		
+		Weapons.Add(Weapon);
 
 	}
 
 	FTimerHandle TimerHandleDelay;
 	GetWorldTimerManager().SetTimer(TimerHandleDelay, this, &ASCharacter::StartDelayed, 0.5f);
 
+}
+
+void ASCharacter::SwitchWeapon(const bool bNext)
+{
+	if (bNext)
+	{
+		SelectionWeapon++;
+		
+		if (Weapons.Num() <= SelectionWeapon)
+		{
+			SelectionWeapon = 0;
+		}
+	}
+	else
+	{
+		SelectionWeapon--;
+		
+		if (SelectionWeapon < 0)
+		{
+			SelectionWeapon = Weapons.Num() - 1;
+		}
+	}
+
+	UE_LOG(LogTemplateCharacter, Error, TEXT("'%s' Index : '%d'"), *GetNameSafe(this), SelectionWeapon);
 }
 
 void ASCharacter::BeginPlay()
@@ -133,7 +173,7 @@ void ASCharacter::BeginPlay()
 		}
 	}
 
-	CreateWeapon();
+	CreateWeapon(WeaponStarterClass);
 	
 }
 
@@ -160,9 +200,9 @@ void ASCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 
 		// Switch Weapon
 		// Next Weapon
-		EnhancedInputComponent->BindAction(InputActions->SwitchWeaponAction, ETriggerEvent::Started, this, &ASCharacter::NextWeapon);
+		EnhancedInputComponent->BindAction(InputActions->NextWeaponAction, ETriggerEvent::Started, this, &ASCharacter::NextWeapon);
 		// Previous Weapon
-		EnhancedInputComponent->BindAction(InputActions->SwitchWeaponAction, ETriggerEvent::Started, this, &ASCharacter::PreviousWeapon);
+		EnhancedInputComponent->BindAction(InputActions->PreviousWeaponAction, ETriggerEvent::Started, this, &ASCharacter::PreviousWeapon);
 
 		// Widget Score
 		EnhancedInputComponent->BindAction(InputActions->ScoreAction, ETriggerEvent::Started, this, &ASCharacter::ShowScreenScore);
@@ -239,7 +279,7 @@ void ASCharacter::SetupAnimationLayer()
 
 	if (!CurrentWeapon) return;
 
-	UE_LOG(LogTemplateCharacter, Error, TEXT("'%s' CurrentWeapon valid"), *GetNameSafe(this));
+	//UE_LOG(LogTemplateCharacter, Error, TEXT("'%s' CurrentWeapon valid"), *GetNameSafe(this));
 
 	//Setup Layer 1P
 	Mesh1P->LinkAnimClassLayers(CurrentWeapon->GetAnimationLayerFP());

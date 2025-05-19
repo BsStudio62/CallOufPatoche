@@ -31,6 +31,27 @@ enum class EFireMode : uint8
 	AUTO      UMETA(DisplayName = "Auto"),
 };
 
+USTRUCT(BlueprintType)
+struct FWeapon
+{
+	GENERATED_BODY()
+
+public:
+	
+	UPROPERTY(BlueprintReadWrite)
+	FString NameWeapon;
+
+	UPROPERTY(BlueprintReadWrite)
+	int32 MunitionSave;
+
+	UPROPERTY(BlueprintReadWrite)
+	int32 MunitionMagazineSave;
+
+	UPROPERTY(BlueprintReadWrite)
+	TSubclassOf<ASWeapon> WeaponClass;
+		
+};
+
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnFire);
 
 UCLASS()

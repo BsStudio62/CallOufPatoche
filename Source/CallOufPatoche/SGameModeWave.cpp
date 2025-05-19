@@ -242,13 +242,23 @@ void ASGameModeWave::CheckPlayerAlive()
 
 	}
 
+	SetActorTickEnabled(false);
 	GameOver();
 
 }
 
 void ASGameModeWave::GameOver()
 {
+	// Clean Ai 
+	
 	UE_LOG(LogTemp, Error, TEXT("'%s' GameOver"), *GetNameSafe(this));
+
+	ASGameStateWave* GS = GetGameState<ASGameStateWave>();
+
+	if (GS)
+	{
+		GS->NetMulticast_ShowScoringAll(PlayersControllers);
+	}
 }
 
 void ASGameModeWave::CheckAIAlive()

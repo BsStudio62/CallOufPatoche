@@ -33,7 +33,9 @@ public:
 	UInputAction* ScoreAction;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	UInputAction* SwitchWeaponAction;
+	UInputAction* NextWeaponAction;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	UInputAction* PreviousWeaponAction;
 	
 };

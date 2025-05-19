@@ -20,8 +20,13 @@ protected:
 
 	UFUNCTION()
 	void OnRep_Wave();
+
+
 	
 public:
+
+	UFUNCTION(NetMulticast, Unreliable)
+	void NetMulticast_ShowScoringAll(const TArray<APlayerController*>& PCS);
 
 	UFUNCTION(BlueprintPure)
 	int32 GetWave() const { return Wave; }

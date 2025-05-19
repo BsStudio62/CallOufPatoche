@@ -2,8 +2,8 @@
 
 
 #include "SWeapon.h"
-#include "Input/SInputConfigWeapon.h"
 // Input
+#include "Input/SInputConfigWeapon.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "SCharacter.h"
@@ -14,6 +14,7 @@
 #include "SPlayerController.h"
 #include "Widget/SHud.h"
 // Access Macro Multiplayer
+#include "SAttributeComponent.h"
 #include "Net/UnrealNetwork.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateWeapon);
@@ -82,6 +83,10 @@ void ASWeapon::OnRep_HideFakeWeapon()
 
 void ASWeapon::Fire()
 {
+	const USAttributeComponent* AC = USAttributeComponent::GetComponentAttribute(GetOwner());
+	
+	if (AC && AC->GetPlayerIsAlive()) return;
+	
 	if (CheckMunition() || bReloading)
 	{
 		UE_LOG(LogTemplateWeapon, Error, TEXT("'%s' Munition 0"), *GetNameSafe(this));
@@ -336,7 +341,7 @@ bool ASWeapon::CheckMunition()
 
 int32 ASWeapon::CalculateMunition()
 {
-	// Calcul du nombre de balles à recharger
+	// Calcul du nombre de balles ï¿½ recharger
 	int32 MunitionRemain = MagazineCapacity - Munition;
 
 	if (MunitionMagazine >= MunitionRemain)
@@ -518,6 +523,10 @@ void ASWeapon::StartReload()
 
 void ASWeapon::StartAim()
 {
+	const USAttributeComponent* AC = USAttributeComponent::GetComponentAttribute(GetOwner());
+	
+	if (AC && AC->GetPlayerIsAlive()) return;
+	
 	bAiming = true;
 }
 

@@ -33,6 +33,23 @@ void ASGameStateWave::OnRep_Wave()
 
 }
 
+void ASGameStateWave::NetMulticast_ShowScoringAll_Implementation(const TArray<APlayerController*>& PCS)
+{
+	
+	for (APlayerController* PC : PCS)
+	{
+		ASPlayerController* PCP = Cast<ASPlayerController>(PC);
+		
+		if (PCP && PCP->IsLocalController())
+		{
+			
+			
+			PCP->ManageScreenScoring(true);
+			PCP->GetPawn()->DisableInput(PCP);
+		}
+	}
+}
+
 void ASGameStateWave::IncrementeWave()
 {
 	

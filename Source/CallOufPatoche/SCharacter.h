@@ -6,6 +6,7 @@
 #include "SPlayerController.h"
 #include "GameFramework/Character.h"
 #include "Logging/LogMacros.h"
+#include "SWeapon.h"
 #include "SCharacter.generated.h"
 
 UENUM(BlueprintType)
@@ -16,6 +17,8 @@ enum class EAnimationInstance : uint8 {
 	FakeWeapon = 3 UMETA(DisplayName = "FakeWeapon")
 
 };
+
+
 
 class UInputComponent;
 class USkeletalMeshComponent;
@@ -32,6 +35,8 @@ UCLASS(config=Game)
 class CALLOUFPATOCHE_API ASCharacter : public ACharacter
 {
 	GENERATED_BODY()
+
+# pragma region Construction Class
 
 	/** Pawn mesh: 1st person view (arms; seen only by self) */
 	UPROPERTY(VisibleDefaultsOnly, Category=Mesh)
@@ -56,6 +61,8 @@ class CALLOUFPATOCHE_API ASCharacter : public ACharacter
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "IK", meta = (AllowPrivateAccess = "true"))
 	USceneComponent* HandRAds;
+
+#pragma endregion
 	
 public:
 
@@ -88,7 +95,7 @@ protected:
 
 #pragma region Weapon 
 
-	// Weapon Starter //
+	// Weapon Starter Class //
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<ASWeapon> WeaponStarterClass;
 
@@ -100,8 +107,16 @@ protected:
 	UPROPERTY(Replicated, BlueprintReadWrite)
 	ASWeapon* FakeWeapon;
 
-	void CreateWeapon();
+	// Create Weapon //
+	void CreateWeapon(TSubclassOf<ASWeapon> WeaponClass);
 
+	UPROPERTY( BlueprintReadWrite)
+	TArray<FWeapon> Weapons;
+
+	int32 SelectionWeapon;
+
+	void SwitchWeapon(const bool bNext);
+	
 #pragma endregion
 
 	virtual void BeginPlay();
