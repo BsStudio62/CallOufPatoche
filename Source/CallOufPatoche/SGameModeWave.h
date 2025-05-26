@@ -25,10 +25,13 @@ protected:
 
 	void PlayersLocationSpawnPoint();
 
+	UPROPERTY()
 	TArray<ASSpawnPoint*> SpawnPoints;
 
+	UPROPERTY()
 	TArray<ASSpawnPoint*> SpawnPointsPossible;
 
+	UPROPERTY()
 	TArray<APlayerController*> PlayersControllers;
 
 	UPROPERTY(EditDefaultsOnly)
@@ -62,7 +65,7 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Waves")
 	float DelayBetweenWaves;
 
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
 	int32 WaveCount;
 
 	UPROPERTY(VisibleAnywhere)

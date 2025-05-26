@@ -38,16 +38,16 @@ struct FWeapon
 
 public:
 	
-	UPROPERTY(BlueprintReadWrite)
+	UPROPERTY(VisibleAnywhere,BlueprintReadWrite)
 	FString NameWeapon;
 
-	UPROPERTY(BlueprintReadWrite)
+	UPROPERTY(VisibleAnywhere,BlueprintReadWrite)
 	int32 MunitionSave;
 
-	UPROPERTY(BlueprintReadWrite)
+	UPROPERTY(VisibleAnywhere,BlueprintReadWrite)
 	int32 MunitionMagazineSave;
 
-	UPROPERTY(BlueprintReadWrite)
+	UPROPERTY(VisibleAnywhere,BlueprintReadWrite)
 	TSubclassOf<ASWeapon> WeaponClass;
 		
 };

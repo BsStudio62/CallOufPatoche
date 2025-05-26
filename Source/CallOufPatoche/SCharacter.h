@@ -110,7 +110,9 @@ protected:
 	// Create Weapon //
 	void CreateWeapon(TSubclassOf<ASWeapon> WeaponClass);
 
-	UPROPERTY( BlueprintReadWrite)
+	void CreateWeaponByIndex(const int32 Index);
+
+	UPROPERTY(EditAnywhere,BlueprintReadWrite)
 	TArray<FWeapon> Weapons;
 
 	int32 SelectionWeapon;

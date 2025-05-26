@@ -15,6 +15,7 @@
 #include "SPlayerController.h"
 //Access Macro Multiplayer
 #include "Net/UnrealNetwork.h"
+#include "Widget/SHud.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
@@ -133,6 +134,45 @@ void ASCharacter::CreateWeapon(TSubclassOf<ASWeapon> WeaponClass)
 
 }
 
+void ASCharacter::CreateWeaponByIndex(const int32 Index)
+{
+
+	// Create Weapon server
+	if (HasAuthority())
+	{
+		if (!Weapons.IsValidIndex(Index)) return;
+
+		const TSubclassOf<ASWeapon> WeaponClass = Weapons[Index].WeaponClass;
+		
+		CurrentWeapon->Destroy();
+
+		FActorSpawnParameters Params;
+		Params.Owner = this;
+
+		// SpawnWeapon
+		CurrentWeapon = GetWorld()->SpawnActor<ASWeapon>(WeaponClass, FVector::ZeroVector, FRotator::ZeroRotator, Params);
+		// Attach Weapon
+		CurrentWeapon->AttachToComponent(Mesh1P, FAttachmentTransformRules::SnapToTargetNotIncludingScale, CurrentWeapon->GetSocket());
+
+		// Spawn Fake Weapon
+		FakeWeapon = GetWorld()->SpawnActor<ASWeapon>(WeaponClass, FVector::ZeroVector, FRotator::ZeroRotator, Params);
+		// Attach Fake Weapon
+		FakeWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, FakeWeapon->GetSocket());
+		FakeWeapon->HideFakeWeapon(true);
+
+		
+		if (PC)
+		{
+			PC->Client_UpdateHudEnum(EUpdateHud::Weapon, true, nullptr);
+		}
+		
+	}
+
+	FTimerHandle TimerHandleDelay;
+	GetWorldTimerManager().SetTimer(TimerHandleDelay, this, &ASCharacter::StartDelayed, 0.5f);
+	
+}
+
 void ASCharacter::SwitchWeapon(const bool bNext)
 {
 	if (bNext)
@@ -155,6 +195,8 @@ void ASCharacter::SwitchWeapon(const bool bNext)
 	}
 
 	UE_LOG(LogTemplateCharacter, Error, TEXT("'%s' Index : '%d'"), *GetNameSafe(this), SelectionWeapon);
+
+	CreateWeaponByIndex(SelectionWeapon);
 }
 
 void ASCharacter::BeginPlay()
