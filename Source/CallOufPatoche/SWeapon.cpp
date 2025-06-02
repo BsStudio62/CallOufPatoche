@@ -62,6 +62,7 @@ void ASWeapon::BeginPlay()
 	Super::BeginPlay();
 	
 	TimeBetweenShots = 60 / RateOfFire;
+	
 
 }
 
@@ -71,6 +72,7 @@ void ASWeapon::OnRep_HideFakeWeapon()
 	{
 		Weapon->SetOnlyOwnerSee(false);
 		Weapon->SetOwnerNoSee(true);
+		
 	}
 	else
 	{
@@ -128,6 +130,11 @@ void ASWeapon::Fire()
 
 		FVector TraceEnd = EyeLocation + (ShotDirection * DistanceFire);
 
+		if (bAiming)
+		{
+			TraceEnd += FVector(0,0,ZSight);
+		}
+
 		FCollisionQueryParams QueryParams;
 		QueryParams.AddIgnoredActor(MyOwner);
 		QueryParams.AddIgnoredActor(this);
@@ -166,7 +173,7 @@ void ASWeapon::Fire()
 
 			if (DebugWeaponDrawing > 0)
 			{
-				DrawDebugSphere(GetWorld(), Hit.Location, 10.0f, 10, ColorHit, false, 1.0f, 0, 1.0f);
+				DrawDebugSphere(GetWorld(), Hit.Location, 5.0f, 10, ColorHit, false, 1.0f, 0, 1.0f);
 			}
 			
 
@@ -176,7 +183,7 @@ void ASWeapon::Fire()
 
 		if (DebugWeaponDrawing > 0)
 		{
-			DrawDebugLine(GetWorld(), EyeLocation, TraceEnd, FColor::White, false, 1.0f, 0, 1.0f);
+			DrawDebugLine(GetWorld(), EyeLocation, TraceEnd, FColor::White, false, 1.0f, 0, 0.5f);
 		}
 
 		if (PC && CameraShakeFire)
@@ -482,6 +489,7 @@ void ASWeapon::HideFakeWeapon(bool HideFakeWeapon)
 		Weapon->SetOnlyOwnerSee(false);
 		Weapon->SetOwnerNoSee(true);
 		FakeWeapon = HideFakeWeapon;
+		HideAssessory();
 	}
 	
 }

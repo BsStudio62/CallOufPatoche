@@ -107,6 +107,12 @@ protected:
 	UPROPERTY(ReplicatedUsing = OnRep_HideFakeWeapon, VisibleAnywhere)
 	bool FakeWeapon;
 
+	UFUNCTION(BlueprintImplementableEvent)
+	void HideAssessory();
+
+	UPROPERTY(EditAnywhere)
+	float ZSight;
+
 	UFUNCTION()
 	virtual void OnRep_HideFakeWeapon();
 
