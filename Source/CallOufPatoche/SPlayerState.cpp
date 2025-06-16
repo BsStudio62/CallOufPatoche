@@ -14,7 +14,7 @@ ASPlayerState::ASPlayerState()
 
 	Points = 0;
 
-	NetUpdateFrequency = 5.0f;
+	SetNetUpdateFrequency(5.0f);
 
 }
 

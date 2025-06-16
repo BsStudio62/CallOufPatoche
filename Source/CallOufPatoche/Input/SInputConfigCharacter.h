@@ -37,5 +37,7 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	UInputAction* PreviousWeaponAction;
-	
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	UInputAction* RunningAction;
 };

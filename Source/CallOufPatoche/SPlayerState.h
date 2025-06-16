@@ -38,7 +38,7 @@ public:
 #pragma region // Set
 
 	UFUNCTION(BlueprintCallable)
-	void AddScores(float ScoreDelta) { Score += ScoreDelta; }
+	void AddScores(float ScoreDelta) {SetScore( GetScore() + ScoreDelta); }
 
 	UFUNCTION(BlueprintCallable)
 	void AddKills(int32 Kill) { Kills += Kill; }

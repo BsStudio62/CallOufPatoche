@@ -138,6 +138,15 @@ protected:
 
 	void InitializationIkSystem();
 
+	// @Todo convertir la var en rep Notify
+	//Running
+	UPROPERTY(BlueprintReadWrite)
+	bool bRunning;
+	
+	void Running();
+
+	void StopRunning();
+	
 protected:
 
 	// APawn interface

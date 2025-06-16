@@ -14,6 +14,7 @@
 #include "Interface/SInterface.h"
 #include "SPlayerController.h"
 //Access Macro Multiplayer
+#include "GameFramework/CharacterMovementComponent.h"
 #include "Net/UnrealNetwork.h"
 #include "Widget/SHud.h"
 
@@ -249,6 +250,10 @@ void ASCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 		// Widget Score
 		EnhancedInputComponent->BindAction(InputActions->ScoreAction, ETriggerEvent::Started, this, &ASCharacter::ShowScreenScore);
 		EnhancedInputComponent->BindAction(InputActions->ScoreAction, ETriggerEvent::Completed, this, &ASCharacter::HideScreenScore);
+
+		// Running
+		EnhancedInputComponent->BindAction(InputActions->RunningAction, ETriggerEvent::Started, this, &ASCharacter::Running);
+		EnhancedInputComponent->BindAction(InputActions->RunningAction, ETriggerEvent::Completed, this, &ASCharacter::StopRunning);
 	}
 	else
 	{
@@ -341,6 +346,18 @@ void ASCharacter::InitializationIkSystem()
 
 	}
 
+}
+
+void ASCharacter::Running()
+{
+	bRunning = true;
+	GetCharacterMovement()->MaxWalkSpeed = 800.0f; 
+}
+
+void ASCharacter::StopRunning()
+{
+	bRunning = false;
+	GetCharacterMovement()->MaxWalkSpeed = 600.0f; 
 }
 
 void ASCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const

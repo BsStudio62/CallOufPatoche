@@ -365,7 +365,7 @@ int32 ASWeapon::CalculateMunition()
 		return MunitionUsed;
 	}
 
-	return 0;
+	//return 0;
 }
 
 void ASWeapon::RefillMunitionMax(AActor* OwnerChar)
