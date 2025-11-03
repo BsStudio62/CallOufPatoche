@@ -118,6 +118,9 @@ protected:
 	int32 SelectionWeapon;
 
 	void SwitchWeapon(const bool bNext);
+
+	UPROPERTY(EditDefaultsOnly)
+	bool bFakeWeapon;
 	
 #pragma endregion
 

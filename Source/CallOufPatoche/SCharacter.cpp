@@ -56,6 +56,8 @@ ASCharacter::ASCharacter()
 	HandRAds->SetupAttachment(Mesh1P);
 	
 	SelectionWeapon = 0;
+
+	bFakeWeapon = true;
 }
 
 void ASCharacter::InteractionSystem()
@@ -116,12 +118,15 @@ void ASCharacter::CreateWeapon(TSubclassOf<ASWeapon> WeaponClass)
 		// Attach Weapon
 		CurrentWeapon->AttachToComponent(Mesh1P, FAttachmentTransformRules::SnapToTargetNotIncludingScale, CurrentWeapon->GetSocket());
 
-		// Spawn Fake Weapon
-		FakeWeapon = GetWorld()->SpawnActor<ASWeapon>(WeaponClass, FVector::ZeroVector, FRotator::ZeroRotator, Params);
-		// Attach Fake Weapon
-		FakeWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, FakeWeapon->GetSocket());
-		FakeWeapon->HideFakeWeapon(true);
-
+		if (bFakeWeapon)
+		{
+			// Spawn Fake Weapon
+			FakeWeapon = GetWorld()->SpawnActor<ASWeapon>(WeaponClass, FVector::ZeroVector, FRotator::ZeroRotator, Params);
+			// Attach Fake Weapon
+			FakeWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, FakeWeapon->GetSocket());
+			FakeWeapon->HideFakeWeapon(true);
+		}
+		
 		FWeapon Weapon;
 
 		Weapon.WeaponClass = WeaponClass;
@@ -350,12 +355,16 @@ void ASCharacter::InitializationIkSystem()
 
 void ASCharacter::Running()
 {
+	if (GetVelocity().IsNearlyZero()) return;
+	
 	bRunning = true;
 	GetCharacterMovement()->MaxWalkSpeed = 800.0f; 
 }
 
 void ASCharacter::StopRunning()
 {
+	if (bRunning == false) return;
+
 	bRunning = false;
 	GetCharacterMovement()->MaxWalkSpeed = 600.0f; 
 }
